@@ -4,7 +4,7 @@ use lambda::Lambda;
 
 pub mod app;
 pub mod cond;
-pub mod exercise;
+pub mod utils;
 pub mod lambda;
 
 /// The definition for our (currently) untyped lambda calculus

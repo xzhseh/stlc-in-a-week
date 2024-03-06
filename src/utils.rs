@@ -1,5 +1,6 @@
-//! The exercise part is to check your understanding of
+//! The utils part is to check your understanding of
 //! our basic stlc at this moment.
+//! Treat this as an exercise to get familiarize with lambda calculus
 //! Feel free to add / change any test at the bottom
 //! in order to fully test your implementation!
 //! For reference solution, check `src/solution.rs`.
