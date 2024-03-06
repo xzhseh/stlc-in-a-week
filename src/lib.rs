@@ -6,6 +6,7 @@ pub mod app;
 pub mod cond;
 pub mod lambda;
 pub mod utils;
+pub mod ycombinator;
 
 /// The definition for our (currently) untyped lambda calculus
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -30,4 +31,36 @@ pub enum Exp {
     Incr(Box<Exp>),
     /// Decrement, i.e., dec exp
     Decr(Box<Exp>),
+}
+
+impl Exp {
+    /// Day3-Q1
+    pub fn eval_one_step_cbv(_exp: Exp) -> Exp {
+        todo!()
+    }
+
+    /// Day3-Q2
+    pub fn eval_one_step_cbn(_exp: Exp) -> Exp {
+        todo!()
+    }
+
+    /// Day4-Q1
+    pub fn eval_multi_step_cbv(_exp: Exp) -> Exp {
+        todo!()
+    }
+
+    /// Day4-Q2
+    pub fn eval_multi_step_cbn(_exp: Exp) -> Exp {
+        todo!()
+    }
+
+    /// Day4-Q3
+    pub fn eval_omega() -> ! {
+        todo!()
+    }
+
+    /// Day4-Q4
+    pub fn grow_omega() -> ! {
+        todo!()
+    }
 }
