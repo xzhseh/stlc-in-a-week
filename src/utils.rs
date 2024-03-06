@@ -3,7 +3,7 @@
 //! Treat this as an exercise to get familiarize with lambda calculus
 //! Feel free to add / change any test at the bottom
 //! in order to fully test your implementation!
-//! For reference solution, check `src/solution.rs`.
+//! For reference solution, check `solution/utils.rs`.
 
 use crate::Exp;
 
