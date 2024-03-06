@@ -7,8 +7,8 @@
 
 use crate::Exp;
 
-/// Q1: Write a function to check whether the given variable
-/// is "free" in the provided expression.
+/// Q1: Write a function to check whether or not
+/// the given variable is "free" in the provided expression.
 /// To say a variable is free, basically we need to check if
 /// it has been *bound* to some outer lambda abstraction(s).
 /// e.g., In `\x. \y. x y z`, `x` is bound by the first lambda
@@ -24,9 +24,20 @@ pub fn appears_free_in(_exp: Exp, _var: String) -> bool {
     todo!()
 }
 
+/// Q2: Write a function to check whether or not the input `Exp`
+/// is a *value*, per the definition below.
+///
+/// v ::= \x. t         -- lambda abstraction
+///       | true        -- constant true
+///       | false       -- constant false
+///       | n           -- natural number
+pub fn is_value(_exp: Exp) -> bool {
+    todo!()
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::{app::App, lambda::Lambda};
+    use crate::{app::App, cond::Cond, lambda::Lambda};
 
     use super::*;
 
@@ -59,5 +70,23 @@ mod tests {
                 ))),
             ))),
         )))
+    }
+
+    #[test]
+    fn test_is_value_basic() {
+        let exp1 = Exp::Nat(114514);
+        let exp2 = Exp::True;
+        let exp3 = Exp::False;
+        // Spoiler: `exp4` is ill-typed, since we haven't introduced type system yet, this is okay
+        let exp4 = Exp::Cond(Box::new(Cond::new(
+            exp1.clone(),
+            exp2.clone(),
+            exp3.clone(),
+        )));
+
+        assert_eq!(true, is_value(exp1));
+        assert_eq!(true, is_value(exp2));
+        assert_eq!(true, is_value(exp3));
+        assert_eq!(false, is_value(exp4));
     }
 }

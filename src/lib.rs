@@ -4,8 +4,8 @@ use lambda::Lambda;
 
 pub mod app;
 pub mod cond;
-pub mod utils;
 pub mod lambda;
+pub mod utils;
 
 /// The definition for our (currently) untyped lambda calculus
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -26,8 +26,8 @@ pub enum Exp {
     Nat(u32),
     /// IsZero, think of this as a special application expression, i.e., IsZero n
     IsZero(Box<Exp>),
-    /// Increment, i.e., inc n
+    /// Increment, i.e., inc exp
     Incr(Box<Exp>),
-    /// Decrement, i.e., dec n
+    /// Decrement, i.e., dec exp
     Decr(Box<Exp>),
 }
