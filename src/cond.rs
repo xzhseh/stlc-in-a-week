@@ -2,9 +2,9 @@ use crate::Exp;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Cond {
-    r#if: Exp,
-    r#then: Exp,
-    r#else: Exp,
+    pub r#if: Exp,
+    pub r#then: Exp,
+    pub r#else: Exp,
 }
 
 impl Cond {

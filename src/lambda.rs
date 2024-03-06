@@ -4,8 +4,8 @@ use crate::Exp;
 /// e.g., `\x. t` would be represents as `Lambda { arg: "x", exp: Exp }`
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Lambda {
-    arg: String,
-    exp: Exp,
+    pub arg: String,
+    pub exp: Exp,
 }
 
 impl Lambda {

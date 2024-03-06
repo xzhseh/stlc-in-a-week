@@ -20,8 +20,47 @@ use crate::Exp;
 /// Note: We will assume that there are NOT any lamda abstractions in
 /// its body that binds the same variable.
 /// e.g., `\x. \y. x (\z. \x. z x) y` will not be included.
-pub fn appears_free_in(_exp: Exp, _var: String) -> bool {
-    todo!()
+pub fn appears_free_in(exp: Exp, var: String) -> bool {
+    /// Helper function to check if the input *variable* appears
+    /// in the given expression
+    fn check_var_appear(exp: Exp, var: String) -> bool {
+        match exp {
+            Exp::Var(v) => var == v,
+            Exp::Lambda(lambda) => check_var_appear(lambda.exp, var),
+            Exp::App(app) => check_var_appear(app.t1, var.clone()) || check_var_appear(app.t2, var),
+            Exp::Cond(cond) => {
+                check_var_appear(cond.r#if, var.clone())
+                    || check_var_appear(cond.r#then, var.clone())
+                    || check_var_appear(cond.r#else, var)
+            }
+            Exp::IsZero(e) => check_var_appear(*e, var),
+            Exp::Incr(e) => check_var_appear(*e, var),
+            Exp::Decr(e) => check_var_appear(*e, var),
+            _ => false,
+        }
+    }
+
+    /// Helper function to check if the *lambda abstraction* appears
+    /// in the given expression
+    fn check_lambda_appear(exp: Exp, var: String) -> bool {
+        match exp {
+            Exp::Lambda(lambda) => lambda.arg == var || check_lambda_appear(lambda.exp, var),
+            Exp::App(app) => {
+                check_lambda_appear(app.t1, var.clone()) || check_lambda_appear(app.t2, var)
+            }
+            Exp::Cond(cond) => {
+                check_lambda_appear(cond.r#if, var.clone())
+                    || check_lambda_appear(cond.r#then, var.clone())
+                    || check_lambda_appear(cond.r#else, var)
+            }
+            Exp::IsZero(e) => check_lambda_appear(*e, var),
+            Exp::Incr(e) => check_lambda_appear(*e, var),
+            Exp::Decr(e) => check_lambda_appear(*e, var),
+            _ => false,
+        }
+    }
+
+    !(check_var_appear(exp.clone(), var.clone()) && check_lambda_appear(exp, var))
 }
 
 /// Day2-Q2: Write a function to check whether or not the input `Exp`
@@ -31,16 +70,20 @@ pub fn appears_free_in(_exp: Exp, _var: String) -> bool {
 ///       | true        -- constant true
 ///       | false       -- constant false
 ///       | n           -- natural number
-pub fn is_value(_exp: Exp) -> bool {
-    todo!()
+pub fn is_value(exp: Exp) -> bool {
+    match exp {
+        Exp::Lambda(_) | Exp::True | Exp::False | Exp::Nat(_) => true,
+        _ => false,
+    }
 }
 
 /// Day2-Q3: Write a function that perform a *substitution* on the
-/// `origin` expression. i.e., if any of the following 
+/// `origin` expression. i.e., if any of the following
 /// substitution rules applies, reduce `origin` expression by
 /// the corresponding substitution. `var` is the exactly variable
 /// to be reduced.
-/// 
+///
+/// ```ignore
 ///     [x := s] x                       = s
 ///     [x := s] y                       = y, if x != y
 ///     [x := s] (\x. t)                 = \x. t
@@ -52,6 +95,7 @@ pub fn is_value(_exp: Exp) -> bool {
 ///     [x := s] true                    = true
 ///     [x := s] false                   = false
 ///     [x := s] (if t1 then t2 else t3) = if [x := s] t1 then [x := s] t2 else [x := s] t3
+/// ```
 pub fn substitute_expr(_var: String, _s: Exp, _origin: Exp) -> Exp {
     todo!()
 }

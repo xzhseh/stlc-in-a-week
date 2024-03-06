@@ -3,8 +3,8 @@ use crate::Exp;
 /// Treat this as a function application
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct App {
-    t1: Exp,
-    t2: Exp,
+    pub t1: Exp,
+    pub t2: Exp,
 }
 
 impl App {
