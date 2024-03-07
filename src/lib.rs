@@ -42,7 +42,6 @@ impl Exp {
     /// accurately follows the rules
     pub fn eval_one_step_cbv(&self, exp: Exp) -> Exp {
         match exp {
-
             _ => panic!(),
         }
     }

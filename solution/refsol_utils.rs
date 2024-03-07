@@ -67,3 +67,64 @@ pub fn is_value(exp: Exp) -> bool {
         _ => false,
     }
 }
+
+/// Day2-Q3: Write a function that perform a *substitution* on the
+/// `origin` expression. i.e., if any of the following
+/// substitution rules applies, reduce `origin` expression by
+/// the corresponding substitution. `var` is the exactly variable
+/// to be reduced.
+///
+/// ```ignore
+///     [x := s] x                       = s
+///     [x := s] y                       = y, if x != y
+///     [x := s] (\x. t)                 = \x. t
+///     [x := s] (\y. t)                 = \y. [x := s] t, if x != y
+///     [x := s] (t1 t2)                 = ([x := s] t1) ([x := s] t2)
+///     [x := s] (inc t)                 = inc ([x := s] t)
+///     [x := s] (dec t)                 = dec ([x := s] t)
+///     [x := s] (IsZero t)              = IsZero ([x := s] t)
+///     [x := s] true                    = true
+///     [x := s] false                   = false
+///     [x := s] n                       = n
+///     [x := s] (if t1 then t2 else t3) = if [x := s] t1 then [x := s] t2 else [x := s] t3
+/// ```
+pub fn substitute_expr(var: String, s: Exp, origin: Exp) -> Exp {
+    match origin.clone() {
+        // [x := s] x && [x := s] y
+        Exp::Var(v) => {
+            if v == var {
+                s
+            } else {
+                origin
+            }
+        }
+        // [x := s] (\x. t) && [x := s] (\y. t)
+        Exp::Lambda(lambda) => {
+            if lambda.arg == var {
+                origin
+            } else {
+                Exp::Lambda(Box::new(Lambda::new(
+                    lambda.arg,
+                    substitute_expr(var, s, lambda.exp),
+                )))
+            }
+        }
+        // [x := s] (t1 t2)
+        Exp::App(app) => Exp::App(Box::new(App::new(
+            substitute_expr(var.clone(), s.clone(), app.t1),
+            substitute_expr(var, s, app.t2),
+        ))),
+        // [x := s] (if t1 then t2 else t3)
+        Exp::Cond(cond) => Exp::Cond(Box::new(Cond::new(
+            substitute_expr(var.clone(), s.clone(), cond.r#if),
+            substitute_expr(var.clone(), s.clone(), cond.r#then),
+            substitute_expr(var, s, cond.r#else),
+        ))),
+        // [x := s] (inc t)
+        Exp::Incr(e) => Exp::Incr(Box::new(substitute_expr(var, s, *e))),
+        // [x := s] (dec t)
+        Exp::Decr(e) => Exp::Decr(Box::new(substitute_expr(var, s, *e))),
+        // [x := s] true && [x := s] false && [x := s] n
+        e => e,
+    }
+}
