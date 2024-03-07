@@ -80,7 +80,7 @@ pub fn is_value(exp: Exp) -> bool {
 /// Day2-Q3: Write a function that perform a *substitution* on the
 /// `origin` expression. i.e., if any of the following
 /// substitution rules applies, reduce `origin` expression by
-/// the corresponding substitution. `var` is the exactly variable
+/// the corresponding substitution. `var` is the exact variable
 /// to be reduced.
 ///
 /// ```ignore
