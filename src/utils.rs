@@ -1,11 +1,11 @@
 //! The utils part is to check your understanding of
 //! our basic stlc at this moment.
-//! Treat this as an exercise to get familiarize with lambda calculus
-//! Feel free to add / change any test at the bottom
-//! in order to fully test your implementation!
-//! For reference solution, check `solution/utils.rs`.
+//! Treat this as an exercise to get familiarize with lambda calculus (and of course, Rust itself)
+//! Feel free to add / change any test at the bottom in order to fully test your implementation!
+//! The functions to implement may or may not be used in the future
+//! For reference solution, check `solution/refsol_utils.rs`.
 
-use crate::Exp;
+use crate::{app::App, cond::Cond, lambda::Lambda, Exp};
 
 /// Day2-Q1: Write a function to check whether or not
 /// the given variable is "free" in the provided expression.
@@ -94,10 +94,48 @@ pub fn is_value(exp: Exp) -> bool {
 ///     [x := s] (IsZero t)              = IsZero ([x := s] t)
 ///     [x := s] true                    = true
 ///     [x := s] false                   = false
+///     [x := s] n                       = n
 ///     [x := s] (if t1 then t2 else t3) = if [x := s] t1 then [x := s] t2 else [x := s] t3
 /// ```
-pub fn substitute_expr(_var: String, _s: Exp, _origin: Exp) -> Exp {
-    todo!()
+pub fn substitute_expr(var: String, s: Exp, origin: Exp) -> Exp {
+    match origin.clone() {
+        // [x := s] x && [x := s] y
+        Exp::Var(v) => {
+            if v == var {
+                s
+            } else {
+                origin
+            }
+        }
+        // [x := s] (\x. t) && [x := s] (\y. t)
+        Exp::Lambda(lambda) => {
+            if lambda.arg == var {
+                origin
+            } else {
+                Exp::Lambda(Box::new(Lambda::new(
+                    lambda.arg,
+                    substitute_expr(var, s, lambda.exp),
+                )))
+            }
+        }
+        // [x := s] (t1 t2)
+        Exp::App(app) => Exp::App(Box::new(App::new(
+            substitute_expr(var.clone(), s.clone(), app.t1),
+            substitute_expr(var, s, app.t2),
+        ))),
+        // [x := s] (if t1 then t2 else t3)
+        Exp::Cond(cond) => Exp::Cond(Box::new(Cond::new(
+            substitute_expr(var.clone(), s.clone(), cond.r#if),
+            substitute_expr(var.clone(), s.clone(), cond.r#then),
+            substitute_expr(var, s, cond.r#else),
+        ))),
+        // [x := s] (inc t)
+        Exp::Incr(e) => Exp::Incr(Box::new(substitute_expr(var, s, *e))),
+        // [x := s] (dec t)
+        Exp::Decr(e) => Exp::Decr(Box::new(substitute_expr(var, s, *e))),
+        // [x := s] true && [x := s] false && [x := s] n
+        e => e,
+    }
 }
 
 #[cfg(test)]
