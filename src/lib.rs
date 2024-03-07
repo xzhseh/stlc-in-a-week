@@ -35,22 +35,22 @@ pub enum Exp {
 
 impl Exp {
     /// Day3-Q1
-    pub fn eval_one_step_cbv(_exp: Exp) -> Exp {
+    pub fn eval_one_step_cbv(&self, _exp: Exp) -> Exp {
         todo!()
     }
 
     /// Day3-Q2
-    pub fn eval_one_step_cbn(_exp: Exp) -> Exp {
+    pub fn eval_one_step_cbn(&self, _exp: Exp) -> Exp {
         todo!()
     }
 
     /// Day4-Q1
-    pub fn eval_multi_step_cbv(_exp: Exp) -> Exp {
+    pub fn eval_multi_step_cbv(&self, _exp: Exp) -> Exp {
         todo!()
     }
 
     /// Day4-Q2
-    pub fn eval_multi_step_cbn(_exp: Exp) -> Exp {
+    pub fn eval_multi_step_cbn(&self, _exp: Exp) -> Exp {
         todo!()
     }
 
