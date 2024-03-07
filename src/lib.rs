@@ -136,9 +136,7 @@ impl Exp {
                 // Every other rule is essentially the same
                 // -----------------------
                 // (\x. t1) t2  -> [x := t2] t1
-                Exp::Lambda(lambda) => {
-                    substitute_expr(lambda.arg, app.t2, lambda.exp)
-                }
+                Exp::Lambda(lambda) => substitute_expr(lambda.arg, app.t2, lambda.exp),
                 //    t1 -> t1'
                 // ---------------
                 // t1 t2 -> t1' t2
@@ -269,5 +267,42 @@ mod tests {
             Exp::Nat(1),
         )));
         assert_eq!(exp1.eval_multi_step_cbv(2), Exp::Nat(2));
+    }
+
+    #[test]
+    fn test_eval_multi_step_cbn_basic() {
+        // (\x. \y. inc y)
+        let exp1 = Exp::Lambda(Box::new(Lambda::new(
+            "x".to_string(),
+            Exp::Lambda(Box::new(Lambda::new(
+                "y".to_string(),
+                Exp::Incr(Box::new(Exp::Var("y".to_string()))),
+            ))),
+        )));
+        // omega := (\x. x x) (\x. x x)
+        let omega = Exp::App(Box::new(App::new(
+            Exp::Lambda(Box::new(Lambda::new(
+                "x".to_string(),
+                Exp::App(Box::new(App::new(
+                    Exp::Var("x".to_string()),
+                    Exp::Var("x".to_string()),
+                ))),
+            ))),
+            Exp::Lambda(Box::new(Lambda::new(
+                "x".to_string(),
+                Exp::App(Box::new(App::new(
+                    Exp::Var("x".to_string()),
+                    Exp::Var("x".to_string()),
+                ))),
+            ))),
+        )));
+        let nat1 = Exp::Nat(1);
+
+        // (\x. \y. inc y) omega 1 -> 2
+        let exp = Exp::App(Box::new(App::new(
+            Exp::App(Box::new(App::new(exp1, omega))),
+            nat1,
+        )));
+        assert_eq!(exp.eval_multi_step_cbn(3), Exp::Nat(2));
     }
 }
