@@ -34,23 +34,34 @@ pub enum Exp {
 }
 
 impl Exp {
-    /// Day3-Q1
-    pub fn eval_one_step_cbv(&self, _exp: Exp) -> Exp {
-        todo!()
+    /// Day3-Q1: Write a *helper* function that evaluate *one* step
+    /// further using call-by-value evaluation strategy for the given expression
+    /// ----
+    /// Hint: whenever you stuck, consider review the three operational rules
+    /// for call-by-value in the handout, and check if your implementation
+    /// accurately follows the rules
+    pub fn eval_one_step_cbv(&self, exp: Exp) -> Exp {
+        match exp {
+
+            _ => panic!(),
+        }
     }
 
-    /// Day3-Q2
+    /// Day3-Q2: Same as what we have done for cbv,
+    /// it's time to implement the same *helper* function for call-by-name!
+    /// ----
+    /// Hint: the operational rules are your best friends
     pub fn eval_one_step_cbn(&self, _exp: Exp) -> Exp {
         todo!()
     }
 
     /// Day4-Q1
-    pub fn eval_multi_step_cbv(&self, _exp: Exp) -> Exp {
+    pub fn eval_multi_step_cbv(&self, _exp: Exp, _step: u32) -> Exp {
         todo!()
     }
 
     /// Day4-Q2
-    pub fn eval_multi_step_cbn(&self, _exp: Exp) -> Exp {
+    pub fn eval_multi_step_cbn(&self, _exp: Exp, _step: u32) -> Exp {
         todo!()
     }
 
