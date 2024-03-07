@@ -128,7 +128,85 @@ impl Exp {
     /// ----
     /// Hint: the operational rules are your best friends
     pub fn eval_one_step_cbn(self) -> Exp {
-        todo!()
+        match self.clone() {
+            Exp::App(app) => match app.t1.clone() {
+                // Note: the key difference between Call-By-Value and Call-By-Name
+                // is that in Call-By-Name strategy, we'd like to perform
+                // beta-reduction *as soon as* possible
+                // Every other rule is essentially the same
+                // -----------------------
+                // (\x. t1) t2  -> [x := t2] t1
+                Exp::Lambda(lambda) => {
+                    substitute_expr(lambda.arg, app.t2, lambda.exp)
+                }
+                //    t1 -> t1'
+                // ---------------
+                // t1 t2 -> t1' t2
+                _ => {
+                    if is_value(app.t1.clone()) {
+                        panic!("invalid expression: {:#?}", self);
+                    } else {
+                        Exp::App(Box::new(App::new(app.t1.eval_one_step_cbn(), app.t2)))
+                    }
+                }
+            },
+            Exp::Cond(cond) => match cond.r#if.clone() {
+                // -----------------------------
+                // if true then t1 else t2 -> t1
+                Exp::True => cond.r#then,
+                // ------------------------------
+                // if false then t1 else t2 -> t2
+                Exp::False => cond.r#else,
+                //                    t1 -> t1'
+                // -----------------------------------------------
+                // if t1 then t2 else t3 -> if t1' then t2 else t3
+                _ => {
+                    assert!(
+                        !is_value(cond.r#if.clone()),
+                        "expect if clause not to be values except `true` or `false`"
+                    );
+                    Exp::Cond(Box::new(Cond::new(
+                        cond.r#if.eval_one_step_cbn(),
+                        cond.r#then,
+                        cond.r#else,
+                    )))
+                }
+            },
+            Exp::IsZero(e) => match *e {
+                // ----------------    -----------------
+                // IsZero 0 -> true && IsZero _ -> false
+                Exp::Nat(num) => {
+                    if num == 0 {
+                        Exp::True
+                    } else {
+                        Exp::False
+                    }
+                }
+                //        t -> t'
+                // ---------------------
+                // IsZero t -> IsZero t'
+                _ => Exp::IsZero(Box::new(e.eval_one_step_cbn())),
+            },
+            Exp::Incr(e) => match *e {
+                // ---------------
+                // Incr n -> n + 1
+                Exp::Nat(num) => Exp::Nat(num.saturating_add(1)),
+                //      t -> t'
+                // -----------------
+                // Incr t -> Incr t'
+                _ => Exp::Incr(Box::new(e.eval_one_step_cbn())),
+            },
+            Exp::Decr(e) => match *e {
+                // ---------------    -----------
+                // Decr n -> n - 1 && Decr 0 -> 0
+                Exp::Nat(num) => Exp::Nat(num.saturating_sub(1)),
+                //      t -> t'
+                // -----------------
+                // Decr t -> Decr t'
+                _ => Exp::Decr(Box::new(e.eval_one_step_cbn())),
+            },
+            _ => panic!("invalid expression: {:#?}", self),
+        }
     }
 
     /// Day3-Q3: Write a "driver" function to evaluate the given expression
