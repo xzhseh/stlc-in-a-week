@@ -41,8 +41,8 @@ impl Exp {
     /// Hint: whenever you stuck, consider review the three operational rules
     /// for call-by-value in the handout, and check if your implementation
     /// accurately follows the rules
-    pub fn eval_one_step_cbv(&self, exp: Exp) -> Exp {
-        match exp.clone() {
+    pub fn eval_one_step_cbv(self) -> Exp {
+        match self.clone() {
             Exp::App(app) => match app.t1.clone() {
                 // -----------------------
                 // (\x. t) v -> [x := v] t
@@ -50,7 +50,7 @@ impl Exp {
                     if is_value(app.t2.clone()) {
                         substitute_expr(lambda.arg, app.t2, lambda.exp)
                     } else {
-                        Exp::App(Box::new(App::new(app.t1, self.eval_one_step_cbv(app.t2))))
+                        Exp::App(Box::new(App::new(app.t1, app.t2.eval_one_step_cbv())))
                     }
                 }
                 //    t1 -> t1'
@@ -58,9 +58,9 @@ impl Exp {
                 // t1 t2 -> t1' t2
                 _ => {
                     if is_value(app.t1.clone()) {
-                        panic!("invalid expression: {:#?}", exp);
+                        panic!("invalid expression: {:#?}", self);
                     } else {
-                        Exp::App(Box::new(App::new(self.eval_one_step_cbv(app.t1), app.t2)))
+                        Exp::App(Box::new(App::new(app.t1.eval_one_step_cbv(), app.t2)))
                     }
                 }
             },
@@ -80,7 +80,7 @@ impl Exp {
                         "expect if clause not to be values except `true` or `false`"
                     );
                     Exp::Cond(Box::new(Cond::new(
-                        self.eval_one_step_cbv(cond.r#if),
+                        cond.r#if.eval_one_step_cbv(),
                         cond.r#then,
                         cond.r#else,
                     )))
@@ -99,7 +99,7 @@ impl Exp {
                 //        t -> t'
                 // ---------------------
                 // IsZero t -> IsZero t'
-                _ => Exp::IsZero(Box::new(self.eval_one_step_cbv(*e))),
+                _ => Exp::IsZero(Box::new(e.eval_one_step_cbv())),
             },
             Exp::Incr(e) => match *e {
                 // ---------------
@@ -108,7 +108,7 @@ impl Exp {
                 //      t -> t'
                 // -----------------
                 // Incr t -> Incr t'
-                _ => Exp::Incr(Box::new(self.eval_one_step_cbv(*e))),
+                _ => Exp::Incr(Box::new(e.eval_one_step_cbv())),
             },
             Exp::Decr(e) => match *e {
                 // ---------------    -----------
@@ -117,9 +117,9 @@ impl Exp {
                 //      t -> t'
                 // -----------------
                 // Decr t -> Decr t'
-                _ => Exp::Decr(Box::new(self.eval_one_step_cbv(*e))),
+                _ => Exp::Decr(Box::new(e.eval_one_step_cbv())),
             },
-            _ => panic!("invalid expression: {:#?}", exp),
+            _ => panic!("invalid expression: {:#?}", self),
         }
     }
 
@@ -131,23 +131,44 @@ impl Exp {
         todo!()
     }
 
-    /// Day4-Q1
+    /// Day3-Q3
     pub fn eval_multi_step_cbv(&self, _exp: Exp, _step: u32) -> Exp {
         todo!()
     }
 
-    /// Day4-Q2
+    /// Day3-Q4
     pub fn eval_multi_step_cbn(&self, _exp: Exp, _step: u32) -> Exp {
         todo!()
     }
 
-    /// Day4-Q3
+    /// Day4-Q1
     pub fn eval_omega() -> ! {
         todo!()
     }
 
-    /// Day4-Q4
+    /// Day4-Q1
     pub fn grow_omega() -> ! {
         todo!()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_eval_one_step_cbv_basic() {
+        // (\x. inc x) 1 -> 2
+        let exp1 = Exp::App(Box::new(App::new(
+            Exp::Lambda(Box::new(Lambda::new(
+                "x".to_string(),
+                Exp::Incr(Box::new(Exp::Var("x".to_string()))),
+            ))),
+            Exp::Nat(1),
+        )));
+        let first_step = exp1.eval_one_step_cbv();
+        assert_eq!(first_step, Exp::Incr(Box::new(Exp::Nat(1))));
+        let second_step = first_step.eval_one_step_cbv();
+        assert_eq!(second_step, Exp::Nat(2));
     }
 }

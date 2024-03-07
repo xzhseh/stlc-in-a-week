@@ -4,7 +4,7 @@ use crate::Exp;
 struct YCombinator(Exp);
 
 impl YCombinator {
-    /// Day5-Q1: Initlialize your yCombinator here
+    /// Day4-Q3: Initlialize your yCombinator here
     #[allow(dead_code)]
     pub fn new() -> Self {
         todo!()
