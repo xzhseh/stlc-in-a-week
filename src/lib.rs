@@ -127,18 +127,26 @@ impl Exp {
     /// it's time to implement the same *helper* function for call-by-name!
     /// ----
     /// Hint: the operational rules are your best friends
-    pub fn eval_one_step_cbn(&self, _exp: Exp) -> Exp {
+    pub fn eval_one_step_cbn(self) -> Exp {
         todo!()
     }
 
-    /// Day3-Q3
-    pub fn eval_multi_step_cbv(&self, _exp: Exp, _step: u32) -> Exp {
-        todo!()
+    /// Day3-Q3: Write a "driver" function to evaluate the given expression
+    /// exactly the given steps, so that we don't need to manually evaluate.
+    /// This would be *especially* useful when we are dealing with yCombinator later.
+    pub fn eval_multi_step_cbv(mut self, step: u32) -> Exp {
+        for _ in 0..step {
+            self = self.eval_one_step_cbv();
+        }
+        self
     }
 
-    /// Day3-Q4
-    pub fn eval_multi_step_cbn(&self, _exp: Exp, _step: u32) -> Exp {
-        todo!()
+    /// Day3-Q4: Same as cbv, write a "driver" function also for call-by-name strategy.
+    pub fn eval_multi_step_cbn(mut self, step: u32) -> Exp {
+        for _ in 0..step {
+            self = self.eval_one_step_cbn();
+        }
+        self
     }
 
     /// Day4-Q1
@@ -170,5 +178,18 @@ mod tests {
         assert_eq!(first_step, Exp::Incr(Box::new(Exp::Nat(1))));
         let second_step = first_step.eval_one_step_cbv();
         assert_eq!(second_step, Exp::Nat(2));
+    }
+
+    #[test]
+    fn test_eval_multi_step_cbv_basic() {
+        // (\x. inc x) 1 -> 2
+        let exp1 = Exp::App(Box::new(App::new(
+            Exp::Lambda(Box::new(Lambda::new(
+                "x".to_string(),
+                Exp::Incr(Box::new(Exp::Var("x".to_string()))),
+            ))),
+            Exp::Nat(1),
+        )));
+        assert_eq!(exp1.eval_multi_step_cbv(2), Exp::Nat(2));
     }
 }
