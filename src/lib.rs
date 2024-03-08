@@ -183,23 +183,19 @@ impl Exp {
 
     /// Day3-Q3: Write a "driver" function to evaluate the given expression
     /// exactly the given steps, so that we don't need to manually evaluate.
+    /// Of course, you need to distinguish between different evaluation strategies.
     /// This would be *especially* useful when we are dealing with yCombinator later.
-    pub fn eval_multi_step_cbv(mut self, step: u32) -> Result<Exp> {
+    pub fn eval_multi_step(mut self, step: u32, strategy: Strategy) -> Result<Exp> {
         for _ in 0..step {
-            self = self.eval_one_step_cbv()?;
+            self = match strategy {
+                Strategy::CallByValue => self.eval_one_step_cbv()?,
+                Strategy::CallByName => self.eval_one_step_cbn()?,
+            }
         }
         Ok(self)
     }
 
-    /// Day3-Q4: Same as cbv, write a "driver" function also for call-by-name strategy.
-    pub fn eval_multi_step_cbn(mut self, step: u32) -> Result<Exp> {
-        for _ in 0..step {
-            self = self.eval_one_step_cbn()?;
-        }
-        Ok(self)
-    }
-
-    /// Day3-Q5: Write a function to help reduce the current expression
+    /// Day3-Q4: Write a function to help reduce the current expression
     /// to its normal form under the specified strategy.
     pub fn eval_to_normal_form(mut self, strategy: Strategy) -> Result<Exp> {
         for _ in 0..UPPER_BOUND {
@@ -230,7 +226,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_eval_one_step_cbv_basic() {
+    fn test_eval_one_step_basic() {
         // (\x. inc x) 1 -> 2
         let exp1 = Exp::App(Box::new(App::new(
             Exp::Lambda(Box::new(Lambda::new(
@@ -240,15 +236,23 @@ mod tests {
             Exp::Nat(1),
         )));
 
-        let first_step = exp1.eval_one_step_cbv().unwrap();
-        assert_eq!(first_step, Exp::Incr(Box::new(Exp::Nat(1))));
+        // CBV
+        let first_step_cbv = exp1.clone().eval_one_step_cbv().unwrap();
+        assert_eq!(first_step_cbv, Exp::Incr(Box::new(Exp::Nat(1))));
 
-        let second_step = first_step.eval_one_step_cbv().unwrap();
-        assert_eq!(second_step, Exp::Nat(2));
+        let second_step_cbv = first_step_cbv.eval_one_step_cbv().unwrap();
+        assert_eq!(second_step_cbv, Exp::Nat(2));
+
+        // CBN should produce the exact same step
+        let first_step_cbn = exp1.eval_one_step_cbn().unwrap();
+        assert_eq!(first_step_cbn, Exp::Incr(Box::new(Exp::Nat(1))));
+
+        let second_step_cbn = first_step_cbn.eval_one_step_cbn().unwrap();
+        assert_eq!(second_step_cbn, Exp::Nat(2));
     }
 
     #[test]
-    fn test_eval_multi_step_cbv_basic() {
+    fn test_eval_multi_step_basic() {
         // (\x. inc x) 1 -> 2
         let exp1 = Exp::App(Box::new(App::new(
             Exp::Lambda(Box::new(Lambda::new(
@@ -258,11 +262,19 @@ mod tests {
             Exp::Nat(1),
         )));
 
-        assert_eq!(exp1.eval_multi_step_cbv(2).unwrap(), Exp::Nat(2));
-    }
+        // CBV
+        assert_eq!(
+            exp1.clone()
+                .eval_multi_step(2, Strategy::CallByValue)
+                .unwrap(),
+            Exp::Nat(2)
+        );
+        // CBN
+        assert_eq!(
+            exp1.eval_multi_step(2, Strategy::CallByName).unwrap(),
+            Exp::Nat(2)
+        );
 
-    #[test]
-    fn test_eval_multi_step_cbn_basic() {
         // (\x. \y. inc y)
         let exp1 = Exp::Lambda(Box::new(Lambda::new(
             "x".to_string(),
@@ -271,7 +283,7 @@ mod tests {
                 Exp::Incr(Box::new(Exp::Var("y".to_string()))),
             ))),
         )));
-        // omega := (\x. x x) (\x. x x)
+        // ω := (\x. x x) (\x. x x)
         let omega = Exp::App(Box::new(App::new(
             Exp::Lambda(Box::new(Lambda::new(
                 "x".to_string(),
@@ -290,11 +302,24 @@ mod tests {
         )));
         let nat1 = Exp::Nat(1);
 
-        // (\x. \y. inc y) omega 1 -> 2
+        // (\x. \y. inc y) ω 1 -> 2
         let exp = Exp::App(Box::new(App::new(
             Exp::App(Box::new(App::new(exp1, omega))),
             nat1,
         )));
-        assert_eq!(exp.eval_multi_step_cbn(3).unwrap(), Exp::Nat(2));
+
+        // Call-By-Name
+        assert_eq!(
+            exp.eval_multi_step(3, Strategy::CallByName).unwrap(),
+            Exp::Nat(2)
+        );
+
+        // Try to use `eval_multi_step` with Call-By-Value strategy here and observe the result.
+        //                            cbv
+        // i.e., (\x. \y. inc y) ω 1 -----> ???
+        // ----
+        // Q1: Is the result conforming to your expectation?
+        // Q2: Is it different from Call-By-Name strategy?
+        // If your answer to Q2 is yes, then why is it different?
     }
 }
