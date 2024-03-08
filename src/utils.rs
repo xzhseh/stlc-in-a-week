@@ -5,7 +5,10 @@
 //! The functions to implement may or may not be used in the future
 //! For reference solution, check `solution/refsol_utils.rs`.
 
-use crate::{app::App, cond::Cond, lambda::Lambda, Exp};
+use crate::{
+    expr::{app::App, cond::Cond, lambda::Lambda},
+    Exp,
+};
 
 /// Day2-Q1: Write a function to check whether or not
 /// the given variable is "free" in the provided expression.
@@ -140,8 +143,6 @@ pub fn substitute_expr(var: String, s: Exp, origin: Exp) -> Exp {
 
 #[cfg(test)]
 mod tests {
-    use crate::{app::App, cond::Cond, lambda::Lambda};
-
     use super::*;
 
     #[test]

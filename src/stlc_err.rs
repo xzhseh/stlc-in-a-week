@@ -23,6 +23,5 @@ pub enum StlcError {
     /// our operational semantics this will take a huge amount
     /// of steps to reduce the input expression to its normal form.
     ExceedEvalLimit(String),
-
     // TODO: add more custom errors to fit your need(s)!
 }

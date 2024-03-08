@@ -1,12 +1,8 @@
-use app::App;
-use cond::Cond;
-use lambda::Lambda;
+use expr::{app::App, cond::Cond, cons::Cons, lambda::Lambda};
 use stlc_err::StlcError;
 use utils::{is_value, substitute_expr};
 
-pub mod app;
-pub mod cond;
-pub mod lambda;
+pub mod expr;
 pub mod refsols;
 pub mod stlc_err;
 pub mod utils;
@@ -40,6 +36,11 @@ pub enum Exp {
     Incr(Box<Exp>),
     /// Decrement, i.e., dec exp
     Decr(Box<Exp>),
+    // TODO(Day1-Q1): Add your self-defined list encoding syntax here.
+    // Feel free to play with it in `main.rs` and encoding it just
+    // like any other `Exp` we've seen so far.
+    Nil,
+    Cons(Box<Cons>),
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -163,7 +164,7 @@ impl Exp {
         }
     }
 
-    /// Day3-Q1: Write a *helper* function that evaluate *one* step
+    /// TODO(Day3-Q1): Write a *helper* function that evaluate *one* step
     /// further using call-by-value evaluation strategy for the given expression
     /// ----
     /// Hint: whenever you stuck, consider review the three operational rules
@@ -173,7 +174,7 @@ impl Exp {
         self.eval(Strategy::CallByValue)
     }
 
-    /// Day3-Q2: Same as what we have done for cbv,
+    /// TODO(Day3-Q2): Same as what we have done for cbv,
     /// it's time to implement the same *helper* function for call-by-name!
     /// ----
     /// Hint: the operational rules are your best friends
@@ -181,7 +182,7 @@ impl Exp {
         self.eval(Strategy::CallByName)
     }
 
-    /// Day3-Q3: Write a "driver" function to evaluate the given expression
+    /// TODO(Day3-Q3): Write a "driver" function to evaluate the given expression
     /// exactly the given steps, so that we don't need to manually evaluate.
     /// Of course, you need to distinguish between different evaluation strategies.
     /// This would be *especially* useful when we are dealing with yCombinator later.
@@ -195,7 +196,7 @@ impl Exp {
         Ok(self)
     }
 
-    /// Day3-Q4: Write a function to help reduce the current expression
+    /// TODO(Day3-Q4): Write a function to help reduce the current expression
     /// to its normal form under the specified strategy.
     pub fn eval_to_normal_form(mut self, strategy: Strategy) -> Result<Exp> {
         for _ in 0..UPPER_BOUND {
@@ -210,12 +211,17 @@ impl Exp {
         Err(StlcError::ExceedEvalLimit(format!("{:#?}", self)))
     }
 
-    /// Day4-Q1
+    /// TODO(Day4-Q1): Write a function to observe different behavior when we
+    /// evaluating expression with omega under two evaluation strategies.
+    /// The current function signature indicates it will never return,
+    /// but of course, feel free to change this.
     pub fn eval_omega() -> ! {
         todo!()
     }
 
-    /// Day4-Q1
+    /// TODO(Day4-Q2): After knowing what a omega is, could you think of any expression
+    /// that will *grow* larger after each evaluation step?
+    /// Write the expression down and evaluate it here to prove your answer.
     pub fn grow_omega() -> ! {
         todo!()
     }
@@ -321,5 +327,8 @@ mod tests {
         // Q1: Is the result conforming to your expectation?
         // Q2: Is it different from Call-By-Name strategy?
         // If your answer to Q2 is yes, then why is it different?
+        // ----
+        // P.S. If you don't know the answer yet, just put a pin here.
+        // Hopefully you could answer this question after day 4.
     }
 }
