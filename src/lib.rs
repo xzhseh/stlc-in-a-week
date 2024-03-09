@@ -1,4 +1,4 @@
-use expr::{app::App, cond::Cond, cons::Cons, lambda::Lambda};
+use expr::{app::App, cond::Cond, lambda::Lambda};
 use stlc_err::StlcError;
 use utils::{is_value, substitute_expr};
 
@@ -37,11 +37,9 @@ pub enum Exp {
     Incr(Box<Exp>),
     /// Decrement, i.e., dec exp
     Decr(Box<Exp>),
-    // TODO(Day1-Q2): Add your self-defined list encoding syntax here.
+    // TODO(Day1-Q2): Add your self-defined syntax here.
     // Feel free to play with it in `main.rs` and encoding it just
     // like any other `Exp` we've seen so far.
-    Nil,
-    Cons(Box<Cons>),
 }
 
 #[derive(Debug, Eq, PartialEq)]
