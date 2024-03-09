@@ -12,4 +12,8 @@ impl Lambda {
     pub fn new(arg: String, exp: Exp) -> Self {
         Self { arg, exp }
     }
+
+    pub fn new_with_box(arg: String, exp: Exp) -> Box<Self> {
+        Box::new(Self { arg, exp })
+    }
 }

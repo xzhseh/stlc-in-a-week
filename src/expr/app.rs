@@ -11,4 +11,8 @@ impl App {
     pub fn new(t1: Exp, t2: Exp) -> Self {
         Self { t1, t2 }
     }
+
+    pub fn new_with_box(t1: Exp, t2: Exp) -> Box<Self> {
+        Box::new(Self { t1, t2 })
+    }
 }

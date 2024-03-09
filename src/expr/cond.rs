@@ -15,4 +15,12 @@ impl Cond {
             r#else,
         }
     }
+
+    pub fn new_with_box(r#if: Exp, r#then: Exp, r#else: Exp) -> Box<Self> {
+        Box::new(Self {
+            r#if,
+            r#then,
+            r#else,
+        })
+    }
 }

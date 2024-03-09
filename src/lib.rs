@@ -2,6 +2,7 @@ use expr::{app::App, cond::Cond, cons::Cons, lambda::Lambda};
 use stlc_err::StlcError;
 use utils::{is_value, substitute_expr};
 
+pub mod day1_exercise;
 pub mod expr;
 pub mod refsols;
 pub mod stlc_err;
@@ -30,13 +31,13 @@ pub enum Exp {
     False,
     /// Naturual number, i.e., n
     Nat(u32),
-    /// IsZero, think of this as a special application expression, i.e., IsZero n
+    /// IsZero, think of this as a special application expression, i.e., IsZero t
     IsZero(Box<Exp>),
     /// Increment, i.e., inc exp
     Incr(Box<Exp>),
     /// Decrement, i.e., dec exp
     Decr(Box<Exp>),
-    // TODO(Day1-Q1): Add your self-defined list encoding syntax here.
+    // TODO(Day1-Q2): Add your self-defined list encoding syntax here.
     // Feel free to play with it in `main.rs` and encoding it just
     // like any other `Exp` we've seen so far.
     Nil,
@@ -183,7 +184,7 @@ impl Exp {
     }
 
     /// TODO(Day3-Q3): Write a "driver" function to evaluate the given expression
-    /// exactly the given steps, so that we don't need to manually evaluate.
+    /// exactly the given steps, so that we don't need to manually evaluate it step by step.
     /// Of course, you need to distinguish between different evaluation strategies.
     /// This would be *especially* useful when we are dealing with yCombinator later.
     pub fn eval_multi_step(mut self, step: u32, strategy: Strategy) -> Result<Exp> {
