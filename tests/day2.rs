@@ -54,7 +54,7 @@ fn test_is_value_basic() {
 }
 
 #[test]
-fn test_substitute_expr_basic() {
+fn test_substitute_basic() {
     let x = String::from("x");
     let y = String::from("y");
     let z = String::from("z");
@@ -64,15 +64,15 @@ fn test_substitute_expr_basic() {
 
     // [x := s] x => s
     let exp1 = Exp::Var(x.clone());
-    assert_eq!(exp1.substitute_expr(x.clone(), s.clone()), s);
+    assert_eq!(exp1.substitute(x.clone(), s.clone()), s);
 
     // [x := s] y => y
     let exp2 = Exp::Var(y.clone());
-    assert_eq!(exp2.clone().substitute_expr(x.clone(), s.clone()), exp2);
+    assert_eq!(exp2.clone().substitute(x.clone(), s.clone()), exp2);
 
     // [x := s] (\x. x) => (\x. x)
     let exp3 = Exp::Lambda(Box::new(Lambda::new(x.clone(), Exp::Var(x.clone()))));
-    assert_eq!(exp3.clone().substitute_expr(x.clone(), s.clone()), exp3);
+    assert_eq!(exp3.clone().substitute(x.clone(), s.clone()), exp3);
 
     // [x := s] (\z. z x) => (\z. z s)
     let exp4 = Exp::Lambda(Box::new(Lambda::new(
@@ -85,5 +85,5 @@ fn test_substitute_expr_basic() {
         Exp::App(Box::new(App::new(Exp::Var(z.clone()), s.clone()))),
     )));
 
-    assert_eq!(exp4.substitute_expr(x.clone(), s.clone()), result);
+    assert_eq!(exp4.substitute(x.clone(), s.clone()), result);
 }

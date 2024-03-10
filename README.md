@@ -20,7 +20,7 @@ The general roadmap of this tutorial is as follows, of course, it's under constr
 
 - **day 4**: it's time to introduce some "spicier" features into our utlc, which is the ability of **recursion**. to achieve this, we will utilize `yCombinator`, and don't worry, you will learn how it works when we get there.
 
-- **[WIP] day 5 ~ day 7**: introduce a **sound** type systems and make our untyped lambda calulus typed.
+- **[WIP] day 5-7**: introduce a **sound** type systems and make our untyped lambda calulus typed.
 
 Regarding official handout(s), currently they are only available (in Chinese) on my [zhihu article page](https://www.zhihu.com/people/dawn-36-29-53/posts).
 

@@ -17,7 +17,7 @@ impl Exp {
                         // (\x. t) v -> [x := v] t
                         Exp::Lambda(lambda) => {
                             if app.t2.is_value() {
-                                Ok(lambda.exp.substitute_expr(lambda.arg, app.t2))
+                                Ok(lambda.exp.substitute(lambda.arg, app.t2))
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1, app.t2.eval(strategy)?))))
                             }
@@ -42,7 +42,7 @@ impl Exp {
                         // Every other rule is essentially the same
                         // -----------------------
                         // (\x. t1) t2  -> [x := t2] t1
-                        Exp::Lambda(lambda) => Ok(lambda.exp.substitute_expr(lambda.arg, app.t2)),
+                        Exp::Lambda(lambda) => Ok(lambda.exp.substitute(lambda.arg, app.t2)),
                         //    t1 -> t1'
                         // ---------------
                         // t1 t2 -> t1' t2

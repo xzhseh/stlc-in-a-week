@@ -1,9 +1,8 @@
-//! The utils part is to check your understanding of
+//! This exercise mainly aims at checking your understanding of
 //! our basic stlc at this moment.
-//! Treat this as an exercise to get familiarize with lambda calculus (and of course, Rust itself)
-//! Feel free to add / change any test at the bottom in order to fully test your implementation!
-//! The functions to implement may or may not be used in the future
-//! For reference solution, check `solution/refsol_utils.rs`.
+//! Treat this as an chance to get familiarize with lambda calculus (and of course, Rust itself)
+//! The functions to implement may or may not be used in the future (yes, probably just for fun)
+//! For reference solution, feel free to check `src/refsols/refsol_day2.rs`.
 
 use crate::{
     expr::{app::App, cond::Cond, lambda::Lambda},
@@ -18,9 +17,11 @@ impl Exp {
     /// e.g., In `\x. \y. x y z`, `x` is bound by the first lambda
     /// abstraction, while `y` is bound by the second lambda abstraction
     /// `z` in this case is *free*, so the following should apply, i.e.,
+    ///
     ///  1. (`\x. \y. x y z`, `x`).appears_free_in() => False
     ///  2. (`\x. \y. x y z`, `y`).appears_free_in() => False
     ///  3. (`\x. \y. x y z`, `z`).appears_free_in() => True
+    ///
     /// Note: We will assume that there are NOT any lamda abstractions in
     /// its body that binds the same variable.
     /// e.g., `\x. \y. x (\z. \x. z x) y` will not be included.
@@ -89,7 +90,7 @@ impl Exp {
     /// the corresponding substitution. `var` is the exact variable
     /// to be reduced.
     /// Note: this function will *consume* the current expression and
-    /// return a brand new subsituted expression.
+    /// return a brand new substituted expression.
     ///
     /// ```ignore
     ///     [x := s] x                       = s
@@ -105,7 +106,7 @@ impl Exp {
     ///     [x := s] n                       = n
     ///     [x := s] (if t1 then t2 else t3) = if [x := s] t1 then [x := s] t2 else [x := s] t3
     /// ```
-    pub fn substitute_expr(self, var: String, s: Exp) -> Exp {
+    pub fn substitute(self, var: String, s: Exp) -> Exp {
         match self.clone() {
             // [x := s] x && [x := s] y
             Exp::Var(v) => {
@@ -122,25 +123,25 @@ impl Exp {
                 } else {
                     Exp::Lambda(Box::new(Lambda::new(
                         lambda.arg,
-                        lambda.exp.substitute_expr(var, s),
+                        lambda.exp.substitute(var, s),
                     )))
                 }
             }
             // [x := s] (t1 t2)
             Exp::App(app) => Exp::App(Box::new(App::new(
-                app.t1.substitute_expr(var.clone(), s.clone()),
-                app.t2.substitute_expr(var, s),
+                app.t1.substitute(var.clone(), s.clone()),
+                app.t2.substitute(var, s),
             ))),
             // [x := s] (if t1 then t2 else t3)
             Exp::Cond(cond) => Exp::Cond(Box::new(Cond::new(
-                cond.r#if.substitute_expr(var.clone(), s.clone()),
-                cond.r#then.substitute_expr(var.clone(), s.clone()),
-                cond.r#else.substitute_expr(var, s),
+                cond.r#if.substitute(var.clone(), s.clone()),
+                cond.r#then.substitute(var.clone(), s.clone()),
+                cond.r#else.substitute(var, s),
             ))),
             // [x := s] (inc t)
-            Exp::Incr(e) => Exp::Incr(Box::new(e.substitute_expr(var, s))),
+            Exp::Incr(e) => Exp::Incr(Box::new(e.substitute(var, s))),
             // [x := s] (dec t)
-            Exp::Decr(e) => Exp::Decr(Box::new(e.substitute_expr(var, s))),
+            Exp::Decr(e) => Exp::Decr(Box::new(e.substitute(var, s))),
             // [x := s] true && [x := s] false && [x := s] n
             e => e,
         }
