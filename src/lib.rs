@@ -6,7 +6,6 @@ pub mod exercises;
 pub mod expr;
 pub mod refsols;
 pub mod stlc_err;
-pub mod ycombinator;
 
 /// The definition for our (currently) untyped lambda calculus
 #[derive(Debug, Clone, Eq, PartialEq)]

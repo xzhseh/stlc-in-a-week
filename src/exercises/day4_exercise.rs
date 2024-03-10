@@ -24,3 +24,14 @@ impl Exp {
         todo!()
     }
 }
+
+#[allow(dead_code)]
+struct YCombinator(Exp);
+
+impl YCombinator {
+    /// TODO(Day4-Q4): Initlialize your definition of yCombinator here
+    #[allow(dead_code)]
+    pub fn new() -> Self {
+        todo!()
+    }
+}
