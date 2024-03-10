@@ -4,6 +4,8 @@
 //! The functions to implement may or may not be used in the future (yes, probably just for fun)
 //! For reference solution, feel free to check `src/refsols/refsol_day2.rs`.
 
+use std::collections::HashSet;
+
 use crate::{
     expr::{app::App, cond::Cond, lambda::Lambda},
     Exp,
@@ -11,63 +13,62 @@ use crate::{
 
 impl Exp {
     /// TODO(Day2-Q1): Write a function to check whether or not
-    /// the given variable is "free" in the provided expression.
+    /// the given variable *at least once* "free" in the provided expression.
     /// To say a variable is free, basically we need to check if
     /// it has been *bound* to some outer lambda abstraction(s).
     /// e.g., In `\x. \y. x y z`, `x` is bound by the first lambda
     /// abstraction, while `y` is bound by the second lambda abstraction
     /// `z` in this case is *free*, so the following should apply, i.e.,
     ///
-    ///  1. (`\x. \y. x y z`, `x`).appears_free_in() => False
-    ///  2. (`\x. \y. x y z`, `y`).appears_free_in() => False
-    ///  3. (`\x. \y. x y z`, `z`).appears_free_in() => True
+    ///  1. (`\x. \y. x y z`).appears_free_in(`x`) => False
+    ///  2. (`\x. \y. x y z`).appears_free_in(`y`) => False
+    ///  3. (`\x. \y. x y z`).appears_free_in(`z`) => True
+    ///  4. `(\x. x) (\y. x y)`.appears_free_in(`x`) => True
+    ///     => (explanation: `x` is not bound in `\y. x y`)
     ///
     /// Note: We will assume that there are NOT any lamda abstractions in
     /// its body that binds the same variable.
     /// e.g., `\x. \y. x (\z. \x. z x) y` will not be included.
-    pub fn appears_free_in(&self, var: String) -> bool {
-        /// Helper function to check if the input *variable* appears
-        /// in the given expression
-        fn check_var_appear(exp: Exp, var: String) -> bool {
-            match exp {
-                Exp::Var(v) => var == v,
-                Exp::Lambda(lambda) => check_var_appear(lambda.exp, var),
+    pub fn appears_free_in(&self, var: &str) -> bool {
+        /// A context based solution
+        fn appears_free_in_inner(exp: Exp, var: &str, context: &mut HashSet<String>) -> bool {
+            match exp.clone() {
+                Exp::Lambda(lambda) => {
+                    // update context before diving in
+                    context.insert(lambda.arg.clone());
+                    let result = appears_free_in_inner(lambda.exp, var, context);
+                    // clear the context before exiting
+                    // note that here we do not need to consider accidentially clearing
+                    // the outer context, per the assumption above.
+                    // i.e., case like `\x. y (\x. x) x` will not be included
+                    context.remove(&lambda.arg);
+                    result
+                }
+                Exp::Var(v) => {
+                    if v == var.to_string() {
+                        !context.contains(&v)
+                    } else {
+                        // not the variable we are interested in
+                        false
+                    }
+                }
                 Exp::App(app) => {
-                    check_var_appear(app.t1, var.clone()) || check_var_appear(app.t2, var)
+                    appears_free_in_inner(app.t1, var, context)
+                        || appears_free_in_inner(app.t2, var, context)
                 }
                 Exp::Cond(cond) => {
-                    check_var_appear(cond.r#if, var.clone())
-                        || check_var_appear(cond.r#then, var.clone())
-                        || check_var_appear(cond.r#else, var)
+                    appears_free_in_inner(cond.r#if, var, context)
+                        || appears_free_in_inner(cond.r#then, var, context)
+                        || appears_free_in_inner(cond.r#else, var, context)
                 }
-                Exp::IsZero(e) => check_var_appear(*e, var),
-                Exp::Incr(e) => check_var_appear(*e, var),
-                Exp::Decr(e) => check_var_appear(*e, var),
-                _ => false,
+                Exp::IsZero(e) | Exp::Incr(e) | Exp::Decr(e) => {
+                    appears_free_in_inner(*e, var, context)
+                }
+                Exp::Nat(_) | Exp::True | Exp::False => false,
             }
         }
 
-        /// Helper function to check if the *lambda abstraction* appears
-        /// in the given expression
-        fn check_lambda_appear(exp: Exp, var: String) -> bool {
-            match exp {
-                Exp::Lambda(lambda) => lambda.arg == var || check_lambda_appear(lambda.exp, var),
-                Exp::App(app) => {
-                    check_lambda_appear(app.t1, var.clone()) || check_lambda_appear(app.t2, var)
-                }
-                Exp::Cond(cond) => {
-                    check_lambda_appear(cond.r#if, var.clone())
-                        || check_lambda_appear(cond.r#then, var.clone())
-                        || check_lambda_appear(cond.r#else, var)
-                }
-                Exp::IsZero(e) => check_lambda_appear(*e, var),
-                Exp::Incr(e) => check_lambda_appear(*e, var),
-                Exp::Decr(e) => check_lambda_appear(*e, var),
-                _ => false,
-            }
-        }
-
-        !(check_var_appear(self.clone(), var.clone()) && check_lambda_appear(self.clone(), var))
+        appears_free_in_inner(self.clone(), var, &mut HashSet::new())
     }
 
     /// TODO(Day2-Q2): Write a function to check whether or not the input `Exp`

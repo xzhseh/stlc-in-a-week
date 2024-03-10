@@ -1,4 +1,8 @@
-use crate::{expr::{app::App, cond::Cond}, stlc_err::StlcError, Exp, Strategy};
+use crate::{
+    expr::{app::App, cond::Cond},
+    stlc_err::StlcError,
+    Exp, Strategy,
+};
 
 type Result<T> = std::result::Result<T, StlcError>;
 

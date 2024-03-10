@@ -1,37 +1,97 @@
 use stlc::{
-    expr::{app::App, cond::Cond, lambda::Lambda},
+    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, lambda::Lambda, var::Var},
     Exp,
 };
 
 #[test]
 fn test_appears_free_in_basic() {
-    let x = String::from("x");
-    let y = String::from("y");
-    let z = String::from("z");
+    fn basic_exp() -> Exp {
+        let x = String::from("x");
+        let y = String::from("y");
+        let z = String::from("z");
+
+        // The encoding of `\x. \y. x y z`
+        Exp::Lambda(Box::new(Lambda::new(
+            x.clone(),
+            Exp::Lambda(Box::new(Lambda::new(
+                y.clone(),
+                Exp::App(Box::new(App::new(
+                    Exp::Var(x),
+                    Exp::App(Box::new(App::new(Exp::Var(y), Exp::Var(z)))),
+                ))),
+            ))),
+        )))
+    }
 
     let exp = basic_exp();
 
-    assert_eq!(false, exp.appears_free_in(x));
-    assert_eq!(false, exp.appears_free_in(y));
-    assert_eq!(true, exp.appears_free_in(z));
+    assert_eq!(false, exp.appears_free_in("x"));
+    assert_eq!(false, exp.appears_free_in("y"));
+    assert_eq!(true, exp.appears_free_in("z"));
 }
 
-fn basic_exp() -> Exp {
-    let x = String::from("x");
-    let y = String::from("y");
-    let z = String::from("z");
+#[test]
+fn test_appears_free_in_hard() {
+    // The encoding of `((\x. x) (\y. if ((\z. inc z) (inc h)) then (inc r) else (dec w))) 1`
+    let exp = App::build(
+        App::build(
+            Lambda::build("x", Var::build("x")),
+            Lambda::build(
+                "y",
+                Cond::build(
+                    App::build(
+                        Lambda::build("z", Incr::build(Var::build("z"))),
+                        Incr::build(Var::build("h")),
+                    ),
+                    Incr::build(Var::build("r")),
+                    Decr::build(Var::build("w")),
+                ),
+            ),
+        ),
+        1.into(),
+    );
 
-    // The encoding of `\x. \y. x y z`
-    Exp::Lambda(Box::new(Lambda::new(
-        x.clone(),
-        Exp::Lambda(Box::new(Lambda::new(
-            y.clone(),
-            Exp::App(Box::new(App::new(
-                Exp::Var(x),
-                Exp::App(Box::new(App::new(Exp::Var(y), Exp::Var(z)))),
-            ))),
-        ))),
-    )))
+    assert_eq!(false, exp.appears_free_in("x"));
+    // Note: though `y` is not "used", but it has been bound to
+    // the lambda abstraction, i.e., `\y. if (...) then (...) else (...)`
+    // so this will not be considered as "free variable"
+    assert_eq!(false, exp.appears_free_in("y"));
+    assert_eq!(false, exp.appears_free_in("z"));
+    assert_eq!(true, exp.appears_free_in("h"));
+    assert_eq!(true, exp.appears_free_in("r"));
+    assert_eq!(true, exp.appears_free_in("w"));
+}
+
+#[test]
+fn test_appears_free_in_corner() {
+    // The encoding of `(\x. x) (\y. x y)`
+    let exp = App::build(
+        Lambda::build("x", Var::build("x")),
+        Lambda::build("y", App::build(Var::build("x"), Var::build("y"))),
+    );
+
+    assert_eq!(true, exp.appears_free_in("x"));
+    assert_eq!(false, exp.appears_free_in("y"));
+
+    // The encoding of `(\x. x y) (\y. \z. if x then inc y else z)`
+    let exp = App::build(
+        Lambda::build("x", App::build(Var::build("x"), Var::build("y"))),
+        Lambda::build(
+            "y",
+            Lambda::build(
+                "z",
+                Cond::build(
+                    Var::build("x"),
+                    Incr::build(Var::build("y")),
+                    Var::build("z"),
+                ),
+            ),
+        ),
+    );
+
+    assert_eq!(true, exp.appears_free_in("x"));
+    assert_eq!(true, exp.appears_free_in("y"));
+    assert_eq!(false, exp.appears_free_in("z"));
 }
 
 #[test]
