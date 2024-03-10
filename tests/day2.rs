@@ -1,4 +1,7 @@
-use stlc::{expr::{app::App, cond::Cond, lambda::Lambda}, utils::{appears_free_in, is_value, substitute_expr}, Exp};
+use stlc::{
+    expr::{app::App, cond::Cond, lambda::Lambda},
+    Exp,
+};
 
 #[test]
 fn test_appears_free_in_basic() {
@@ -8,9 +11,9 @@ fn test_appears_free_in_basic() {
 
     let exp = basic_exp();
 
-    assert_eq!(false, appears_free_in(exp.clone(), x));
-    assert_eq!(false, appears_free_in(exp.clone(), y));
-    assert_eq!(true, appears_free_in(exp.clone(), z));
+    assert_eq!(false, exp.appears_free_in(x));
+    assert_eq!(false, exp.appears_free_in(y));
+    assert_eq!(true, exp.appears_free_in(z));
 }
 
 fn basic_exp() -> Exp {
@@ -44,10 +47,10 @@ fn test_is_value_basic() {
         exp3.clone(),
     )));
 
-    assert_eq!(true, is_value(exp1));
-    assert_eq!(true, is_value(exp2));
-    assert_eq!(true, is_value(exp3));
-    assert_eq!(false, is_value(exp4));
+    assert_eq!(true, exp1.is_value());
+    assert_eq!(true, exp2.is_value());
+    assert_eq!(true, exp3.is_value());
+    assert_eq!(false, exp4.is_value());
 }
 
 #[test]
@@ -61,15 +64,15 @@ fn test_substitute_expr_basic() {
 
     // [x := s] x => s
     let exp1 = Exp::Var(x.clone());
-    assert_eq!(substitute_expr(x.clone(), s.clone(), exp1), s);
+    assert_eq!(exp1.substitute_expr(x.clone(), s.clone()), s);
 
     // [x := s] y => y
     let exp2 = Exp::Var(y.clone());
-    assert_eq!(substitute_expr(x.clone(), s.clone(), exp2.clone()), exp2);
+    assert_eq!(exp2.clone().substitute_expr(x.clone(), s.clone()), exp2);
 
     // [x := s] (\x. x) => (\x. x)
     let exp3 = Exp::Lambda(Box::new(Lambda::new(x.clone(), Exp::Var(x.clone()))));
-    assert_eq!(substitute_expr(x.clone(), s.clone(), exp3.clone()), exp3);
+    assert_eq!(exp3.clone().substitute_expr(x.clone(), s.clone()), exp3);
 
     // [x := s] (\z. z x) => (\z. z s)
     let exp4 = Exp::Lambda(Box::new(Lambda::new(
@@ -82,5 +85,5 @@ fn test_substitute_expr_basic() {
         Exp::App(Box::new(App::new(Exp::Var(z.clone()), s.clone()))),
     )));
 
-    assert_eq!(substitute_expr(x.clone(), s.clone(), exp4), result);
+    assert_eq!(exp4.substitute_expr(x.clone(), s.clone()), result);
 }

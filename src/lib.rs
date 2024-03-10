@@ -1,6 +1,5 @@
 use expr::{app::App, cond::Cond, lambda::Lambda};
 use stlc_err::StlcError;
-use utils::{is_value, substitute_expr};
 
 pub mod day1_exercise;
 pub mod expr;
@@ -62,8 +61,8 @@ impl Exp {
                         // -----------------------
                         // (\x. t) v -> [x := v] t
                         Exp::Lambda(lambda) => {
-                            if is_value(app.t2.clone()) {
-                                Ok(substitute_expr(lambda.arg, app.t2, lambda.exp))
+                            if app.t2.is_value() {
+                                Ok(lambda.exp.substitute_expr(lambda.arg, app.t2))
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1, app.t2.eval(strategy)?))))
                             }
@@ -72,7 +71,7 @@ impl Exp {
                         // ---------------
                         // t1 t2 -> t1' t2
                         _ => {
-                            if is_value(app.t1.clone()) {
+                            if app.t1.is_value() {
                                 // TODO: format this
                                 return Err(StlcError::StuckExpressionCbv(format!("{:#?}", self)));
                             } else {
@@ -89,12 +88,12 @@ impl Exp {
                         // Every other rule is essentially the same
                         // -----------------------
                         // (\x. t1) t2  -> [x := t2] t1
-                        Exp::Lambda(lambda) => Ok(substitute_expr(lambda.arg, app.t2, lambda.exp)),
+                        Exp::Lambda(lambda) => Ok(lambda.exp.substitute_expr(lambda.arg, app.t2)),
                         //    t1 -> t1'
                         // ---------------
                         // t1 t2 -> t1' t2
                         _ => {
-                            if is_value(app.t1.clone()) {
+                            if app.t1.is_value() {
                                 return Err(StlcError::StuckExpressionCbn(format!("{:#?}", self)));
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1.eval(strategy)?, app.t2))))
@@ -114,10 +113,11 @@ impl Exp {
                 // -----------------------------------------------
                 // if t1 then t2 else t3 -> if t1' then t2 else t3
                 _ => {
-                    assert!(
-                        !is_value(cond.r#if.clone()),
-                        "expect if clause not to be values except `true` or `false`"
-                    );
+                    if !cond.r#if.is_value() {
+                        return Err(StlcError::InvalidExpression(
+                            format!("expect if clause not to be values other than `true` or `false, actual: {:#?}", cond.r#if)
+                        ));
+                    }
                     Ok(Exp::Cond(Box::new(Cond::new(
                         cond.r#if.eval(strategy)?,
                         cond.r#then,
@@ -199,7 +199,7 @@ impl Exp {
     /// to its normal form under the specified strategy.
     pub fn eval_to_normal_form(mut self, strategy: Strategy) -> Result<Exp> {
         for _ in 0..UPPER_BOUND {
-            if is_value(self.clone()) {
+            if self.is_value() {
                 return Ok(self);
             }
             self = match strategy {
