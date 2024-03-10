@@ -1,5 +1,5 @@
 use stlc::{
-    day1_exercise::{Exp1, Exp2, Exp3, Exp4, Exp5},
+    exercises::day1_exercise::{Exp1, Exp2, Exp3, Exp4, Exp5},
     expr::{app::App, cond::Cond, lambda::Lambda},
     Exp,
 };
