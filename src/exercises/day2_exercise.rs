@@ -11,7 +11,7 @@ use crate::{
 };
 
 impl Exp {
-    /// Day2-Q1: Write a function to check whether or not
+    /// TODO(Day2-Q1): Write a function to check whether or not
     /// the given variable is "free" in the provided expression.
     /// To say a variable is free, basically we need to check if
     /// it has been *bound* to some outer lambda abstraction(s).
@@ -69,7 +69,7 @@ impl Exp {
         !(check_var_appear(self.clone(), var.clone()) && check_lambda_appear(self.clone(), var))
     }
 
-    /// Day2-Q2: Write a function to check whether or not the input `Exp`
+    /// TODO(Day2-Q2): Write a function to check whether or not the input `Exp`
     /// is a *value*, per the definition below.
     ///
     /// v ::= \x. t         -- lambda abstraction
@@ -83,7 +83,7 @@ impl Exp {
         }
     }
 
-    /// Day2-Q3: Write a function that perform a *substitution* on the
+    /// TODO(Day2-Q3): Write a function that perform a *substitution* on the
     /// current expression. i.e., if any of the following
     /// substitution rules applies, reduce `origin` expression by
     /// the corresponding substitution. `var` is the exact variable
