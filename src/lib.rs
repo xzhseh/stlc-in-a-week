@@ -27,7 +27,7 @@ pub enum Exp {
     True,
     /// Constant False, i.e., false
     False,
-    /// Naturual number, i.e., n
+    /// Non-negative number, i.e., n
     Nat(u32),
     /// IsZero, think of this as a special application expression, i.e., IsZero t
     IsZero(Box<Exp>),
