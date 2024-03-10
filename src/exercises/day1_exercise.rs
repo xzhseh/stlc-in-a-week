@@ -1,4 +1,5 @@
 //! Used for Day1-Q1 encoding exercises
+//! Feel free to check `src/refsols/refsol_day1.rs` when you get stuck
 
 use crate::Exp;
 

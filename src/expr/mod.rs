@@ -6,3 +6,4 @@ pub mod incr;
 pub mod lambda;
 pub mod nat;
 pub mod var;
+pub mod is_zero;
