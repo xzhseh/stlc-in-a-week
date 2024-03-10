@@ -10,9 +10,6 @@ pub mod stlc_err;
 pub mod utils;
 pub mod ycombinator;
 
-/// Day3-Q5: Choose your favorite upper bound number of evalutation steps
-const UPPER_BOUND: u32 = 1000000;
-
 type Result<T> = std::result::Result<T, StlcError>;
 
 /// The definition for our (currently) untyped lambda calculus
@@ -195,10 +192,15 @@ impl Exp {
         Ok(self)
     }
 
+    /// TODO(Day3-Q4'): Choose your favorite upper bound number of evalutation steps
+    fn upper_bound(&self) -> u32 {
+        114514
+    }
+
     /// TODO(Day3-Q4): Write a function to help reduce the current expression
     /// to its normal form under the specified strategy.
     pub fn eval_to_normal_form(mut self, strategy: Strategy) -> Result<Exp> {
-        for _ in 0..UPPER_BOUND {
+        for _ in 0..self.upper_bound() {
             if self.is_value() {
                 return Ok(self);
             }
@@ -239,9 +241,9 @@ impl fmt::Display for Exp {
             Exp::True => write!(f, "true"),
             Exp::False => write!(f, "false"),
             Exp::Nat(n) => write!(f, "{}", n),
-            Exp::IsZero(e) => write!(f, "is_zero {}", *e),
-            Exp::Incr(e) => write!(f, "incr {}", *e),
-            Exp::Decr(e) => write!(f, "decr {}", *e),
+            Exp::IsZero(e) => write!(f, "is_zero ({})", *e),
+            Exp::Incr(e) => write!(f, "incr ({})", *e),
+            Exp::Decr(e) => write!(f, "decr ({})", *e),
         }
     }
 }

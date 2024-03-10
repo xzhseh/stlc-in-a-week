@@ -19,6 +19,16 @@ impl Lambda {
     pub fn new_with_box(arg: String, exp: Exp) -> Box<Self> {
         Box::new(Self { arg, exp })
     }
+
+    pub fn build(arg: String, exp: Exp) -> Exp {
+        Self::new(arg, exp).into()
+    }
+}
+
+impl From<Lambda> for Exp {
+    fn from(value: Lambda) -> Self {
+        Exp::Lambda(Box::new(value))
+    }
 }
 
 impl fmt::Display for Lambda {

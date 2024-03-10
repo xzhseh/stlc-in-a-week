@@ -18,7 +18,20 @@ impl App {
     }
 
     pub fn new_with_box(t1: Exp, t2: Exp) -> Box<Self> {
-        Box::new(Self { t1, t2 })
+        Box::new(Self::new(t1, t2))
+    }
+
+    /// A constructor level *syntax sugar* just to make everything easier.
+    /// i.e., instead of manually writing `Exp::App(Box::new(App::new(t1, t2)))`,
+    /// we can directly write `App::build(t1, t2)` now.
+    pub fn build(t1: Exp, t2: Exp) -> Exp {
+        Self::new(t1, t2).into()
+    }
+}
+
+impl From<App> for Exp {
+    fn from(value: App) -> Self {
+        Exp::App(Box::new(value))
     }
 }
 

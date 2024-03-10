@@ -25,6 +25,16 @@ impl Cond {
             r#else,
         })
     }
+
+    pub fn build(r#if: Exp, r#then: Exp, r#else: Exp) -> Exp {
+        Cond::new(r#if, r#then, r#else).into()
+    }
+}
+
+impl From<Cond> for Exp {
+    fn from(value: Cond) -> Self {
+        Exp::Cond(Box::new(value))
+    }
 }
 
 impl fmt::Display for Cond {
