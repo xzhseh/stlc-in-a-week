@@ -1,3 +1,5 @@
+use core::fmt;
+
 use crate::Exp;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -22,5 +24,15 @@ impl Cond {
             r#then,
             r#else,
         })
+    }
+}
+
+impl fmt::Display for Cond {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "if ({}) then ({}) else ({})",
+            self.r#if, self.r#then, self.r#else
+        )
     }
 }

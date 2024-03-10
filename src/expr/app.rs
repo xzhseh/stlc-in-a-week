@@ -1,6 +1,11 @@
+use core::fmt;
+
 use crate::Exp;
 
-/// Treat this as a function application
+/// Treat this as a function application.
+/// In general `t1` should be an arrow type (i.e., t1 :: a -> a),
+/// which in our case is a lambda abstraction.
+/// And of course, `t2` could literally be anything that is *valid*.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct App {
     pub t1: Exp,
@@ -14,5 +19,11 @@ impl App {
 
     pub fn new_with_box(t1: Exp, t2: Exp) -> Box<Self> {
         Box::new(Self { t1, t2 })
+    }
+}
+
+impl fmt::Display for App {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "({}) ({})", self.t1, self.t2)
     }
 }

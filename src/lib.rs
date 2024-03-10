@@ -1,3 +1,5 @@
+use core::fmt;
+
 use expr::{app::App, cond::Cond, lambda::Lambda};
 use stlc_err::StlcError;
 
@@ -72,8 +74,7 @@ impl Exp {
                         // t1 t2 -> t1' t2
                         _ => {
                             if app.t1.is_value() {
-                                // TODO: format this
-                                return Err(StlcError::StuckExpressionCbv(format!("{:#?}", self)));
+                                return Err(StlcError::StuckExpressionCbv(format!("{}", self)));
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1.eval(strategy)?, app.t2))))
                             }
@@ -94,7 +95,7 @@ impl Exp {
                         // t1 t2 -> t1' t2
                         _ => {
                             if app.t1.is_value() {
-                                return Err(StlcError::StuckExpressionCbn(format!("{:#?}", self)));
+                                return Err(StlcError::StuckExpressionCbn(format!("{}", self)));
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1.eval(strategy)?, app.t2))))
                             }
@@ -115,7 +116,7 @@ impl Exp {
                 _ => {
                     if !cond.r#if.is_value() {
                         return Err(StlcError::InvalidExpression(
-                            format!("expect if clause not to be values other than `true` or `false, actual: {:#?}", cond.r#if)
+                            format!("expect if clause not to be values other than `true` or `false, actual: {}", cond.r#if)
                         ));
                     }
                     Ok(Exp::Cond(Box::new(Cond::new(
@@ -158,8 +159,7 @@ impl Exp {
                 // Decr t -> Decr t'
                 _ => Ok(Exp::Decr(Box::new(e.eval(strategy)?))),
             },
-            // TODO: add formatting
-            _ => Err(StlcError::InvalidExpression(format!("{:#?}", self))),
+            _ => Err(StlcError::InvalidExpression(format!("{}", self))),
         }
     }
 
@@ -207,7 +207,10 @@ impl Exp {
                 Strategy::CallByName => self.eval_one_step_cbn()?,
             }
         }
-        Err(StlcError::ExceedEvalLimit(format!("{:#?}", self)))
+        Err(StlcError::ExceedEvalLimit(format!(
+            "exceed evaluation limit, current expr: {}",
+            self
+        )))
     }
 
     /// TODO(Day4-Q1): Write a function to observe different behavior when we
@@ -223,5 +226,22 @@ impl Exp {
     /// Write the expression down and evaluate it here to prove your answer.
     pub fn grow_omega() -> ! {
         todo!()
+    }
+}
+
+impl fmt::Display for Exp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self.clone() {
+            Exp::Var(v) => write!(f, "{}", v),
+            Exp::Lambda(lambda) => write!(f, "{}", *lambda),
+            Exp::App(app) => write!(f, "{}", *app),
+            Exp::Cond(cond) => write!(f, "{}", *cond),
+            Exp::True => write!(f, "true"),
+            Exp::False => write!(f, "false"),
+            Exp::Nat(n) => write!(f, "{}", n),
+            Exp::IsZero(e) => write!(f, "is_zero {}", *e),
+            Exp::Incr(e) => write!(f, "incr {}", *e),
+            Exp::Decr(e) => write!(f, "decr {}", *e),
+        }
     }
 }

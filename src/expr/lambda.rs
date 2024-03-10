@@ -1,7 +1,10 @@
+use core::fmt;
+
 use crate::Exp;
 
-/// The actual representation of a lambda abstraction
+/// The actual representation of a lambda abstraction.
 /// e.g., `\x. t` would be represents as `Lambda { arg: "x", exp: Exp }`
+/// Note: This abstraction is probably the *most* important base for our stlc.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Lambda {
     pub arg: String,
@@ -15,5 +18,11 @@ impl Lambda {
 
     pub fn new_with_box(arg: String, exp: Exp) -> Box<Self> {
         Box::new(Self { arg, exp })
+    }
+}
+
+impl fmt::Display for Lambda {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "λ{}. {}", self.arg, self.exp)
     }
 }
