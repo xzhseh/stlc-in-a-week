@@ -20,8 +20,8 @@ impl Lambda {
         Box::new(Self { arg, exp })
     }
 
-    pub fn build(arg: String, exp: Exp) -> Exp {
-        Self::new(arg, exp).into()
+    pub fn build(arg: &str, exp: Exp) -> Exp {
+        Self::new(arg.into(), exp).into()
     }
 }
 

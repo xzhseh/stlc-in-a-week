@@ -17,10 +17,12 @@ fn exp1_test() {
 fn exp2_test() {
     let x = String::from("x");
 
-    let exp2 = Exp::Lambda(Lambda::new_with_box(
+    let exp = Exp::Lambda(Lambda::new_with_box(
         x.clone(),
         Exp::Incr(Box::new(Exp::Var(x))),
     ));
+
+    let exp2 = Exp::App(App::new_with_box(exp, 1.into()));
 
     assert_eq!(Exp2::new(), exp2);
 }
