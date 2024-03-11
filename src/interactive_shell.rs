@@ -55,7 +55,7 @@ fn print_prompt() {
 /// Mainly used for testing and playing around with your stlc.
 fn parse(name: &str) -> Exp {
     if name == "var" {
-        println!("\nenter {} below.", "variable name".green());
+        println!("\nenter {} below.", "variable name".green().underline());
         print_prompt();
         let input = read_line();
         return Var::build(input.as_str());
@@ -63,7 +63,7 @@ fn parse(name: &str) -> Exp {
     println!(
         "\nwhat do you want to {} for {}?\n{}\n{}",
         "build".bright_blue(),
-        name.green(),
+        name.green().underline().bold(),
         format!(
             "(type `{}` to display all available expr(s))",
             "help".green()
@@ -86,7 +86,11 @@ fn parse(name: &str) -> Exp {
         "incr" => Incr::build(parse("incr.e")),
         "decr" => Decr::build(parse("decr.e")),
         "lambda" => {
-            println!("\nenter your lambda abstraction {} below.", "arg".green());
+            println!(
+                "\nenter your lambda abstraction {} below. (e.g., λ{}. e)",
+                "argument".green().underline(),
+                "x".green().bold().underline()
+            );
             print_prompt();
             let input = read_line();
             Lambda::build(input.as_str(), parse("lambda.e"))
@@ -95,7 +99,10 @@ fn parse(name: &str) -> Exp {
         "false" => Exp::False,
         "is_zero" => IsZero::build(parse("is_zero.e")),
         "nat" => {
-            println!("\nenter a {} below.", "non-negative number".green());
+            println!(
+                "\nenter a {} below.",
+                "non-negative number".green().underline()
+            );
             print_prompt();
             let num = read_line();
             let Ok(num) = num.parse::<u32>() else {
@@ -111,7 +118,13 @@ fn parse(name: &str) -> Exp {
             num.into()
         }
         // Endless loop until quit...
-        _ => parse(name),
+        _ => {
+            println!(
+                "\n{} is not a valid expression to choose.",
+                input.red().underline()
+            );
+            parse(name)
+        }
     }
 }
 
@@ -159,7 +172,8 @@ pub fn start_interactive_shell() {
             }
         }
         println!(
-            "\nstart evaluating expression to normal form by {}.",
+            "\nstart evaluating {} to normal form by {}.",
+            exp.to_string().underline(),
             eval_strategy.to_string().green().underline().bold()
         );
         let result;
