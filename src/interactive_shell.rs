@@ -4,9 +4,12 @@
 //! The ultimate goal is to achieve a minimal ghci-like interpreter.
 
 use colored::*;
-use std::{collections::BTreeSet, io::{self, Write}};
-use spin::Mutex;
 use lazy_static::lazy_static;
+use spin::Mutex;
+use std::{
+    collections::BTreeSet,
+    io::{self, Write},
+};
 
 lazy_static! {
     static ref LAMBDA_CONTEXT: Mutex<BTreeSet<String>> = Mutex::new(BTreeSet::new());
@@ -34,6 +37,7 @@ fn print_help_msg() {
     println!("{} e          -- well, obviously", "is_zero".green());
     println!("{} e             -- increment", "incr".green());
     println!("{} e             -- decrement", "decr".green());
+    println!("{}              -- (λx. x x)", "omega".green());
 }
 
 fn read_line() -> String {
@@ -56,10 +60,25 @@ fn print_prompt() {
     }
 }
 
+fn print_out(output: ColoredString, color: Color) {
+    static mut OUT_COUNTER: u32 = 1;
+    unsafe {
+        println!(
+            "\n{}",
+            format!(
+                "{}{}",
+                format!("OUT [{}]: ", OUT_COUNTER.to_string().bold()).color(color),
+                output,
+            )
+        );
+        OUT_COUNTER += 1;
+    }
+}
+
 /// A very tiny parse utility to construct a speicified `Exp`
 /// from command line.
 /// Mainly used for testing and playing around with your stlc.
-fn parse(name: &str) -> Exp {
+fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
     if name == "var" {
         print!("\navailable variable(s) in current lambda context: ");
         let len = LAMBDA_CONTEXT.lock().len();
@@ -75,7 +94,10 @@ fn parse(name: &str) -> Exp {
                 }
             }
         }
-        println!("(of course you could choose any {} that fits your need. 🤪)", "free variable".green().underline());
+        println!(
+            "(of course you could choose any {} that fits your need. 🤪)",
+            "free variable".green().underline()
+        );
         print!("\nenter {} below.\n", "variable name".green().underline());
         let _ = io::stdout().flush();
         print_prompt();
@@ -83,9 +105,10 @@ fn parse(name: &str) -> Exp {
         return Var::build(input.as_str());
     }
     println!(
-        "\nwhat do you want to {} for {}?\n{}\n{}",
+        "\nwhat do you want to {} for {}? {}\n{}\n{}",
         "build".bright_blue(),
         name.green().underline().bold(),
+        hint.unwrap_or("".into()),
         format!(
             "(type `{}` to display all available expr(s))",
             "help".green()
@@ -100,29 +123,85 @@ fn parse(name: &str) -> Exp {
     match input.to_ascii_lowercase().as_str() {
         "help" => {
             print_help_msg();
-            parse(name)
+            parse(name, None)
         }
-        "var" => parse("var"),
-        "app" => App::build(parse("app.t1"), parse("app.t2")),
-        "cond" => Cond::build(parse("cond.if"), parse("cond.then"), parse("cond.else")),
-        "incr" => Incr::build(parse("incr.e")),
-        "decr" => Decr::build(parse("decr.e")),
+        "omega" => Lambda::build("x", App::build(Var::build("x"), Var::build("x"))),
+        "var" => parse("var", None),
+        "app" => App::build(
+            parse(
+                "app.t1",
+                Some(format!("(i.e., app {} t2)", "t1".green().bold().underline()).into()),
+            ),
+            parse(
+                "app.t2",
+                Some(format!("(i.e., app t1 {})", "t2".green().bold().underline()).into()),
+            ),
+        ),
+        "cond" => Cond::build(
+            parse(
+                "cond.if",
+                Some(
+                    format!(
+                        "(i.e., if {} then t2 else t3)",
+                        "t1".green().bold().underline()
+                    )
+                    .into(),
+                ),
+            ),
+            parse(
+                "cond.then",
+                Some(
+                    format!(
+                        "(i.e., if t1 then {} else t3)",
+                        "t2".green().bold().underline()
+                    )
+                    .into(),
+                ),
+            ),
+            parse(
+                "cond.else",
+                Some(
+                    format!(
+                        "(i.e., if t1 then t2 else {})",
+                        "t3".green().bold().underline()
+                    )
+                    .into(),
+                ),
+            ),
+        ),
+        "incr" => Incr::build(parse(
+            "incr.e",
+            Some(format!("(i.e., incr {})", "e".green().bold().underline()).into()),
+        )),
+        "decr" => Decr::build(parse(
+            "decr.e",
+            Some(format!("(i.e., decr {})", "e".green().bold().underline()).into()),
+        )),
         "lambda" => {
             println!(
-                "\nenter your lambda abstraction {} below. (e.g., λ{}. e)",
+                "\nenter your lambda abstraction {} below. (i.e., λ{}. e)",
                 "argument".green().underline(),
                 "x".green().bold().underline()
             );
             print_prompt();
             let input = read_line();
             LAMBDA_CONTEXT.lock().insert(input.clone());
-            let result = Lambda::build(input.as_str(), parse("lambda.e"));
+            let result = Lambda::build(
+                input.as_str(),
+                parse(
+                    "lambda.e",
+                    Some(format!("(i.e., λx. {})", "e".green().bold().underline()).into()),
+                ),
+            );
             LAMBDA_CONTEXT.lock().remove(input.as_str());
             result
         }
         "true" => Exp::True,
         "false" => Exp::False,
-        "is_zero" => IsZero::build(parse("is_zero.e")),
+        "is_zero" => IsZero::build(parse(
+            "is_zero.e",
+            Some(format!("(i.e., is_zero {})", "e".green().bold().underline()).into()),
+        )),
         "nat" => {
             println!(
                 "\nenter a {} below.",
@@ -144,11 +223,12 @@ fn parse(name: &str) -> Exp {
         }
         // Endless loop until quit...
         _ => {
-            println!(
-                "\n{} is not a valid expression to choose.",
+            let output = format!(
+                "{} is not a valid expression to choose.",
                 input.red().underline()
             );
-            parse(name)
+            print_out(output.into(), Color::BrightRed);
+            parse(name, None)
         }
     }
 }
@@ -157,14 +237,12 @@ pub fn start_interactive_shell() {
     println!("Congratulations, the program compiles.");
 
     loop {
-        let exp = parse("begin");
-        println!(
-            "\n{}",
-            format!(
-                "your expression {} has been built.",
-                exp.to_string().bold().underline().green()
-            )
+        let exp = parse("begin", None);
+        let output = format!(
+            "your expression {} has been built.",
+            exp.to_string().bold().underline().green()
         );
+        print_out(output.into(), Color::BrightBlue);
         println!(
             "\nwhich {} would you select?\n{}",
             "evaluation strategy".bold(),
@@ -188,10 +266,11 @@ pub fn start_interactive_shell() {
                     break;
                 }
                 _ => {
-                    println!(
+                    let output = format!(
                         "\n{} has not been supported, PR(s) welcome.",
                         input.red().underline()
                     );
+                    print_out(output.into(), Color::BrightRed);
                     println!("please choose an available strategy.");
                 }
             }
@@ -201,30 +280,19 @@ pub fn start_interactive_shell() {
             exp.to_string().underline(),
             eval_strategy.to_string().green().underline().bold()
         );
-        let result;
         match exp.clone().eval_to_normal_form(eval_strategy) {
-            Ok(res) => result = res,
+            Ok(res) => print_out(
+                res.to_string().underline().bold().green(),
+                Color::BrightBlue,
+            ),
             Err(err) => {
-                println!(
+                let output = format!(
                     "failed to evaluate {}, error: {}",
                     exp.to_string().underline().red(),
                     err
                 );
-                continue;
+                print_out(output.into(), Color::BrightRed);
             }
-        }
-        static mut OUT_COUNTER: u32 = 1;
-        unsafe {
-            println!(
-                "\n{}",
-                format!(
-                    "OUT [{}]: {}",
-                    OUT_COUNTER.to_string().bold(),
-                    result.to_string().underline().bold()
-                )
-                .blue()
-            );
-            OUT_COUNTER += 1;
         }
         print!(
             "\npress `{}` to quit, or `{}` to continue.",

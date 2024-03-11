@@ -25,3 +25,6 @@ The general roadmap of this tutorial is as follows, of course, it's under constr
 Regarding official handout(s), currently they are only available (in Chinese) on my [zhihu article page](https://www.zhihu.com/people/dawn-36-29-53/posts).
 
 Any pull request / issues / advice will be greatly appreciated!
+
+Below is a demo gif using the built-in interactive environment to play with my (i.e., refsols) stlc implementation.
+
