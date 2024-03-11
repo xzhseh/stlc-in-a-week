@@ -4,6 +4,7 @@ use expr::{app::App, cond::Cond, lambda::Lambda};
 
 pub mod exercises;
 pub mod expr;
+pub mod interactive_shell;
 pub mod refsols;
 pub mod stlc_err;
 
@@ -56,6 +57,15 @@ impl fmt::Display for Exp {
             Exp::IsZero(e) => write!(f, "is_zero ({})", *e),
             Exp::Incr(e) => write!(f, "incr ({})", *e),
             Exp::Decr(e) => write!(f, "decr ({})", *e),
+        }
+    }
+}
+
+impl fmt::Display for Strategy {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Strategy::CallByValue => write!(f, "call-by-value"),
+            Strategy::CallByName => write!(f, "call-by-name"),
         }
     }
 }

@@ -1,3 +1,5 @@
+use core::fmt;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum StlcError {
     /// Indicating the current expression is impossible
@@ -24,4 +26,15 @@ pub enum StlcError {
     /// of steps to reduce the input expression to its normal form.
     ExceedEvalLimit(String),
     // TODO: add more custom errors to fit your need(s)!
+}
+
+impl fmt::Display for StlcError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            StlcError::StuckExpressionCbv(err) => write!(f, "StuckExpressionCbv({})", err),
+            StlcError::StuckExpressionCbn(err) => write!(f, "StuckExpressionCbn({})", err),
+            StlcError::InvalidExpression(err) => write!(f, "InvalidExpression({})", err),
+            StlcError::ExceedEvalLimit(err) => write!(f, "ExceedEvalLimit({})", err),
+        }
+    }
 }
