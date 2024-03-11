@@ -4,7 +4,13 @@
 //! The ultimate goal is to achieve a minimal ghci-like interpreter.
 
 use colored::*;
-use std::io::{self, Write};
+use std::{collections::BTreeSet, io::{self, Write}};
+use spin::Mutex;
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref LAMBDA_CONTEXT: Mutex<BTreeSet<String>> = Mutex::new(BTreeSet::new());
+}
 
 use crate::{
     expr::{
@@ -55,7 +61,23 @@ fn print_prompt() {
 /// Mainly used for testing and playing around with your stlc.
 fn parse(name: &str) -> Exp {
     if name == "var" {
-        println!("\nenter {} below.", "variable name".green().underline());
+        print!("\navailable variable(s) in current lambda context: ");
+        let len = LAMBDA_CONTEXT.lock().len();
+        if len == 0 {
+            println!("{}.", "(null)".red().underline());
+        } else {
+            for (i, e) in LAMBDA_CONTEXT.lock().iter().enumerate() {
+                if i == len - 1 {
+                    print!("{}.\n", e.green().underline());
+                    break;
+                } else {
+                    print!("{}, ", e.green().underline());
+                }
+            }
+        }
+        println!("(of course you could choose any {} that fits your need. 🤪)", "free variable".green().underline());
+        print!("\nenter {} below.\n", "variable name".green().underline());
+        let _ = io::stdout().flush();
         print_prompt();
         let input = read_line();
         return Var::build(input.as_str());
@@ -93,7 +115,10 @@ fn parse(name: &str) -> Exp {
             );
             print_prompt();
             let input = read_line();
-            Lambda::build(input.as_str(), parse("lambda.e"))
+            LAMBDA_CONTEXT.lock().insert(input.clone());
+            let result = Lambda::build(input.as_str(), parse("lambda.e"));
+            LAMBDA_CONTEXT.lock().remove(input.as_str());
+            result
         }
         "true" => Exp::True,
         "false" => Exp::False,
