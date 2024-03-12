@@ -1,6 +1,5 @@
 pub mod app;
 pub mod cond;
-pub mod cons;
 pub mod decr;
 pub mod incr;
 pub mod is_zero;
