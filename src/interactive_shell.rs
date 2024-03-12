@@ -22,9 +22,9 @@ use crate::{
     Exp, Strategy,
 };
 
-fn print_help_msg() {
+fn print_list_msg() {
     println!(
-        "\ncurrently supported syntax is as below. ({})",
+        "\ncurrently supported syntax is as below. ({})\n",
         "case-insensitive".underline()
     );
     println!("{} v              -- variable", "var".green());
@@ -67,7 +67,7 @@ fn print_out(output: ColoredString, color: Color) {
             "\n{}",
             format!(
                 "{}{}",
-                format!("OUT [{}]: ", OUT_COUNTER.to_string().bold()).color(color),
+                format!("Out[{}]: ", OUT_COUNTER.to_string().bold()).color(color),
                 output,
             )
         );
@@ -105,25 +105,17 @@ fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
         return Var::build(input.as_str());
     }
     println!(
-        "\nwhat do you want to {} for {}? {}\n{}\n{}",
+        "\nwhat do you want to {} for {}? {}",
         "build".bright_blue(),
         name.green().underline().bold(),
-        hint.unwrap_or("".into()),
-        format!(
-            "(type `{}` to display all available expr(s))",
-            "help".green()
-        ),
-        format!(
-            "(type `{}` to quit the interactive shell)",
-            "ctrl-c".green()
-        ),
+        hint.clone().unwrap_or("".into()),
     );
     print_prompt();
     let input = read_line();
     match input.to_ascii_lowercase().as_str() {
-        "help" => {
-            print_help_msg();
-            parse(name, None)
+        "list" => {
+            print_list_msg();
+            parse(name, hint)
         }
         "omega" => Lambda::build("x", App::build(Var::build("x"), Var::build("x"))),
         "var" => parse("var", None),
@@ -228,13 +220,20 @@ fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
                 input.red().underline()
             );
             print_out(output.into(), Color::BrightRed);
-            parse(name, None)
+            parse(name, hint)
         }
     }
 }
 
 pub fn start_interactive_shell() {
     println!("Congratulations, the program compiles.");
+    println!(
+        "{}",
+        format!(
+            "You could type `{}` to display all available expr(s).",
+            "list".green()
+        )
+    );
 
     loop {
         let exp = parse("begin", None);
@@ -267,7 +266,7 @@ pub fn start_interactive_shell() {
                 }
                 _ => {
                     let output = format!(
-                        "\n{} has not been supported, PR(s) welcome.",
+                        "{} has not been supported, PR(s) welcome.",
                         input.red().underline()
                     );
                     print_out(output.into(), Color::BrightRed);

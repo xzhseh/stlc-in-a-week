@@ -7,7 +7,7 @@
 use std::collections::HashSet;
 
 use crate::{
-    expr::{app::App, cond::Cond, lambda::Lambda},
+    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda},
     Exp,
 };
 
@@ -122,27 +122,25 @@ impl Exp {
                 if lambda.arg == var {
                     self
                 } else {
-                    Exp::Lambda(Box::new(Lambda::new(
-                        lambda.arg,
-                        lambda.exp.substitute(var, s),
-                    )))
+                    Lambda::build(&lambda.arg, lambda.exp.substitute(var, s))
                 }
             }
             // [x := s] (t1 t2)
-            Exp::App(app) => Exp::App(Box::new(App::new(
+            Exp::App(app) => App::build(
                 app.t1.substitute(var.clone(), s.clone()),
                 app.t2.substitute(var, s),
-            ))),
+            ),
             // [x := s] (if t1 then t2 else t3)
-            Exp::Cond(cond) => Exp::Cond(Box::new(Cond::new(
+            Exp::Cond(cond) => Cond::build(
                 cond.r#if.substitute(var.clone(), s.clone()),
                 cond.r#then.substitute(var.clone(), s.clone()),
                 cond.r#else.substitute(var, s),
-            ))),
+            ),
+            Exp::IsZero(e) => IsZero::build(e.substitute(var, s)),
             // [x := s] (inc t)
-            Exp::Incr(e) => Exp::Incr(Box::new(e.substitute(var, s))),
+            Exp::Incr(e) => Incr::build(e.substitute(var, s)),
             // [x := s] (dec t)
-            Exp::Decr(e) => Exp::Decr(Box::new(e.substitute(var, s))),
+            Exp::Decr(e) => Decr::build(e.substitute(var, s)),
             // [x := s] true && [x := s] false && [x := s] n
             e => e,
         }
