@@ -26,5 +26,6 @@ Regarding official handout(s), currently they are only available (in Chinese) on
 
 Any pull request / issues / advice will be greatly appreciated!
 
-Below is a demo gif using the built-in interactive environment to play with my (i.e., refsols) stlc implementation.
+Below is a **demo** gif using the built-in interactive environment to play with my (i.e., reference solutions) stlc implementation.
 
+![demo](img/demo.gif)
