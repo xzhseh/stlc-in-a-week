@@ -1,6 +1,5 @@
 use stlc::{
-    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, lambda::Lambda, var::Var},
-    Exp,
+    exercises::day2_exercise::ValidExpressions, expr::{app::App, cond::Cond, decr::Decr, incr::Incr, lambda::Lambda, var::Var}, Exp
 };
 
 #[test]
@@ -146,4 +145,19 @@ fn test_substitute_basic() {
     )));
 
     assert_eq!(exp4.substitute(x.clone(), s.clone()), result);
+}
+
+#[test]
+fn test_valid_expression_1() {
+    assert_eq!(ValidExpressions::q1(), (false, ""));
+}
+
+#[test]
+fn test_valid_expression_2() {
+    assert_eq!(ValidExpressions::q2(), (false, ""));
+}
+
+#[test]
+fn test_valid_expression_3() {
+    assert_eq!(ValidExpressions::q3(), (false, ""));
 }

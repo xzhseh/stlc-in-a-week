@@ -57,16 +57,3 @@ impl Exp5 {
         App::build(e.clone(), e)
     }
 }
-
-pub struct OpenQuestions;
-impl OpenQuestions {
-    #[allow(dead_code)]
-    pub fn q1() -> &'static str {
-        "put your answer to the first open question here"
-    }
-
-    #[allow(dead_code)]
-    pub fn q2() -> &'static str {
-        "put your answer to the second open question here"
-    }
-}

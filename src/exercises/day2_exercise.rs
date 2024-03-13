@@ -154,20 +154,17 @@ impl Exp {
 pub struct ValidExpressions;
 impl ValidExpressions {
     /// TODO(Day2-Q4): `incr (λx. x)`
-    #[allow(dead_code)]
-    fn q1() -> (bool, &'static str) {
+    pub fn q1() -> (bool, &'static str) {
         todo!()
     }
 
     /// TODO(Day2-Q4): `app true false`
-    #[allow(dead_code)]
-    fn q2() -> (bool, &'static str) {
+    pub fn q2() -> (bool, &'static str) {
         todo!()
     }
 
     /// TODO(Day1-Q3): `if 1 then true else false`
-    #[allow(dead_code)]
-    fn q3() -> (bool, &'static str) {
+    pub fn q3() -> (bool, &'static str) {
         todo!()
     }
 }
