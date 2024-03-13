@@ -1,5 +1,7 @@
 use stlc::{
-    exercises::day2_exercise::ValidExpressions, expr::{app::App, cond::Cond, decr::Decr, incr::Incr, lambda::Lambda, var::Var}, Exp
+    exercises::day2_exercise::ValidExpressions,
+    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, lambda::Lambda, var::Var},
+    Exp,
 };
 
 #[test]

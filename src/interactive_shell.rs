@@ -75,11 +75,17 @@ fn print_out(output: ColoredString, color: Color) {
     }
 }
 
+fn push_with_parenthesis(s: &mut String, e: &Exp) {
+    s.push('(');
+    s.push_str(&e.to_string());
+    s.push(')');
+}
+
 /// A very tiny parse utility to construct a speicified `Exp`
 /// from command line.
 /// Mainly used for testing and playing around with your stlc.
-fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
-    if name == "var" {
+fn parse(mut lhs: String, curr: String, rhs: String) -> Exp {
+    if curr == "var" {
         print!("\navailable variable(s) in current lambda context: ");
         let len = LAMBDA_CONTEXT.lock().len();
         if len == 0 {
@@ -105,70 +111,56 @@ fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
         return Var::build(input.as_str());
     }
     println!(
-        "\nwhat do you want to {} for {}? {}",
-        "build".bright_blue(),
-        name.green().underline().bold(),
-        hint.clone().unwrap_or("".into()),
+        "\nwhat do you want to {} for {}?",
+        "build".bright_blue().bold().underline(),
+        format!("{}{}{}", lhs, curr.green().underline().bold(), rhs),
     );
     print_prompt();
     let input = read_line();
     match input.to_ascii_lowercase().as_str() {
         "list" => {
             print_list_msg();
-            parse(name, hint)
+            parse(lhs, curr, rhs)
         }
         "omega" => Lambda::build("x", App::build(Var::build("x"), Var::build("x"))),
-        "var" => parse("var", None),
-        "app" => App::build(
-            parse(
-                "app.t1",
-                Some(format!("(i.e., app {} t2)", "t1".green().bold().underline()).into()),
-            ),
-            parse(
-                "app.t2",
-                Some(format!("(i.e., app t1 {})", "t2".green().bold().underline()).into()),
-            ),
-        ),
-        "cond" => Cond::build(
-            parse(
-                "cond.if",
-                Some(
-                    format!(
-                        "(i.e., if {} then t2 else t3)",
-                        "t1".green().bold().underline()
-                    )
-                    .into(),
-                ),
-            ),
-            parse(
-                "cond.then",
-                Some(
-                    format!(
-                        "(i.e., if t1 then {} else t3)",
-                        "t2".green().bold().underline()
-                    )
-                    .into(),
-                ),
-            ),
-            parse(
-                "cond.else",
-                Some(
-                    format!(
-                        "(i.e., if t1 then t2 else {})",
-                        "t3".green().bold().underline()
-                    )
-                    .into(),
-                ),
-            ),
-        ),
-        "incr" => Incr::build(parse(
-            "incr.e",
-            Some(format!("(i.e., incr {})", "e".green().bold().underline()).into()),
-        )),
-        "decr" => Decr::build(parse(
-            "decr.e",
-            Some(format!("(i.e., decr {})", "e".green().bold().underline()).into()),
-        )),
+        "var" => parse("".to_string(), "var".to_string(), "".to_string()),
+        "app" => {
+            lhs.push_str("(");
+            let curr_rhs = " t2)".to_string() + &rhs;
+            let t1 = parse(lhs.clone(), "t1".to_string(), curr_rhs);
+            push_with_parenthesis(&mut lhs, &t1);
+            lhs.push(' ');
+            let curr_rhs = ")".to_string() + &rhs;
+            let t2 = parse(lhs, "t2".to_string(), curr_rhs);
+            App::build(t1, t2)
+        }
+        "cond" => {
+            lhs.push_str("(if ");
+            let curr_rhs = " then t2 else t3)".to_string() + &rhs;
+            let t1 = parse(lhs.clone(), "t1".to_string(), curr_rhs);
+            push_with_parenthesis(&mut lhs, &t1);
+            lhs.push_str(" then ");
+            let curr_rhs = " else t3)".to_string() + &rhs;
+            let t2 = parse(lhs.clone(), "t2".to_string(), curr_rhs);
+            push_with_parenthesis(&mut lhs, &t2);
+            lhs.push_str(" else ");
+            let curr_rhs = ")".to_string() + &rhs;
+            let t3 = parse(lhs, "t3".to_string(), curr_rhs);
+
+            Cond::build(t1, t2, t3)
+        }
+        "incr" => {
+            lhs.push_str("(incr ");
+            let curr_rhs = ")".to_string() + &rhs;
+            let e = parse(lhs, "e".to_string(), curr_rhs);
+            Incr::build(e)
+        }
+        "decr" => {
+            lhs.push_str("(decr ");
+            let curr_rhs = ")".to_string() + &rhs;
+            let e = parse(lhs, "e".to_string(), curr_rhs);
+            Decr::build(e)
+        }
         "lambda" => {
             println!(
                 "\nenter your lambda abstraction {} below. (i.e., λ{}. e)",
@@ -178,22 +170,20 @@ fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
             print_prompt();
             let input = read_line();
             LAMBDA_CONTEXT.lock().insert(input.clone());
-            let result = Lambda::build(
-                input.as_str(),
-                parse(
-                    "lambda.e",
-                    Some(format!("(i.e., λx. {})", "e".green().bold().underline()).into()),
-                ),
-            );
+            lhs.push_str(format!("(λ{}. ", input).as_str());
+            let curr_rhs = ")".to_string() + &rhs;
+            let result = parse(lhs, "e".to_string(), curr_rhs);
             LAMBDA_CONTEXT.lock().remove(input.as_str());
-            result
+            Lambda::build(&input, result)
         }
         "true" => Exp::True,
         "false" => Exp::False,
-        "is_zero" => IsZero::build(parse(
-            "is_zero.e",
-            Some(format!("(i.e., is_zero {})", "e".green().bold().underline()).into()),
-        )),
+        "is_zero" => {
+            lhs.push_str("(is_zero ");
+            let curr_rhs = ")".to_string() + &rhs;
+            let e = parse(lhs, "e".to_string(), curr_rhs);
+            IsZero::build(e)
+        }
         "nat" => {
             println!(
                 "\nenter a {} below.",
@@ -220,7 +210,7 @@ fn parse(name: &str, hint: Option<ColoredString>) -> Exp {
                 input.red().underline()
             );
             print_out(output.into(), Color::BrightRed);
-            parse(name, hint)
+            parse(lhs, curr, rhs)
         }
     }
 }
@@ -236,7 +226,9 @@ pub fn start_interactive_shell() {
     );
 
     loop {
-        let exp = parse("begin", None);
+        let lhs = String::from("");
+        let rhs = String::from("");
+        let exp = parse(lhs, "begin".to_string(), rhs);
         let output = format!(
             "your expression {} has been built.",
             exp.to_string().bold().underline().green()
