@@ -7,7 +7,7 @@ use crate::{
 
 pub struct Exp1;
 impl Exp1 {
-    /// TODO(Day1-Q1): Encode `\x. x` here
+    /// `λx. x`
     pub fn new() -> Exp {
         Lambda::build("x", Var::build("x"))
     }
@@ -15,7 +15,7 @@ impl Exp1 {
 
 pub struct Exp2;
 impl Exp2 {
-    /// TODO(Day1-Q1): Encode `(\x. inc x) 1` here
+    /// `(λx. incr x) 1`
     pub fn new() -> Exp {
         App::build(Lambda::build("x", Incr::build(Var::build("x"))), 1.into())
     }
@@ -23,7 +23,7 @@ impl Exp2 {
 
 pub struct Exp3;
 impl Exp3 {
-    /// TODO(Day1-Q1): Encode `(\x. x) ((\y. y) (\z. z))` here
+    /// `(λx. x) ((λy. y) (λz. z))`
     pub fn new() -> Exp {
         App::build(
             Lambda::build("x", Var::build("x")),
@@ -37,7 +37,7 @@ impl Exp3 {
 
 pub struct Exp4;
 impl Exp4 {
-    /// TODO(Day1-Q1): Encode `((\x. x) (\y. if y then false else true)) true` here
+    /// `((λx. x) (λy. if y then false else true)) true`
     pub fn new() -> Exp {
         App::build(
             App::build(
@@ -51,9 +51,22 @@ impl Exp4 {
 
 pub struct Exp5;
 impl Exp5 {
-    /// TODO(Day1-Q1): Encode `(\x. x x) (\x. x x)` here
+    /// `(λx. x x) (λx. x x)`
     pub fn new() -> Exp {
         let e = Lambda::build("x", App::build(Var::build("x"), Var::build("x")));
         App::build(e.clone(), e)
+    }
+}
+
+pub struct OpenQuestions;
+impl OpenQuestions {
+    #[allow(dead_code)]
+    pub fn q1() -> &'static str {
+        "put your answer to the first open question here"
+    }
+
+    #[allow(dead_code)]
+    pub fn q2() -> &'static str {
+        "put your answer to the second open question here"
     }
 }

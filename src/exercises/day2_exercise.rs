@@ -146,3 +146,28 @@ impl Exp {
         }
     }
 }
+
+/// Please check whether the given expression is valid or not
+/// under the context of our currently untyped lambda calculus
+/// after we have learned about the *semantics*.
+/// Don't forget to include your explanation.
+pub struct ValidExpressions;
+impl ValidExpressions {
+    /// TODO(Day2-Q4): `incr (λx. x)`
+    #[allow(dead_code)]
+    fn q1() -> (bool, &'static str) {
+        todo!()
+    }
+
+    /// TODO(Day2-Q4): `app true false`
+    #[allow(dead_code)]
+    fn q2() -> (bool, &'static str) {
+        todo!()
+    }
+
+    /// TODO(Day1-Q3): `if 1 then true else false`
+    #[allow(dead_code)]
+    fn q3() -> (bool, &'static str) {
+        todo!()
+    }
+}

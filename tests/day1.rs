@@ -5,7 +5,7 @@ use stlc::{
 };
 
 #[test]
-fn exp1_test() {
+fn encoding_exp1_test() {
     let x = String::from("x");
 
     let exp1 = Exp::Lambda(Lambda::new_with_box(x.clone(), Exp::Var(x)));
@@ -14,7 +14,7 @@ fn exp1_test() {
 }
 
 #[test]
-fn exp2_test() {
+fn encoding_exp2_test() {
     let x = String::from("x");
 
     let exp = Exp::Lambda(Lambda::new_with_box(
@@ -28,7 +28,7 @@ fn exp2_test() {
 }
 
 #[test]
-fn exp3_test() {
+fn encoding_exp3_test() {
     let x = String::from("x");
     let y = String::from("y");
     let z = String::from("z");
@@ -47,7 +47,7 @@ fn exp3_test() {
 }
 
 #[test]
-fn exp4_test() {
+fn encoding_exp4_test() {
     let x = String::from("x");
     let y = String::from("y");
 
@@ -68,7 +68,7 @@ fn exp4_test() {
 }
 
 #[test]
-fn exp5_test() {
+fn encoding_exp5_test() {
     let x = String::from("x");
 
     // (\x. x x)
