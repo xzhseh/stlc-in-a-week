@@ -71,7 +71,7 @@ impl Exp {
                 // -----------------------------------------------
                 // if t1 then t2 else t3 -> if t1' then t2 else t3
                 _ => {
-                    if !cond.r#if.is_value() {
+                    if cond.r#if.is_value() {
                         return Err(StlcError::InvalidExpression(
                             format!("expect if clause not to be values other than `true` or `false, actual: {}", cond.r#if)
                         ));
