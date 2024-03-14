@@ -289,9 +289,9 @@ pub fn start_interactive_shell() {
             "eval_to_normal_form".to_string().underline()
         );
         println!("\n1. {} 2. {}", "official".green(), "your own".green());
-        print_prompt();
         let mut flag = false;
         loop {
+            print_prompt();
             let input = read_line();
             match input.as_str() {
                 "1" => break,

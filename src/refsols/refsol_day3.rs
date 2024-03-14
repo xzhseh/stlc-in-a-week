@@ -143,7 +143,7 @@ impl Exp {
     }
 
     pub fn ref_eval_to_normal_form(mut self, strategy: Strategy) -> Result<(Exp, u32)> {
-        for i in 1..=self.ref_upper_bound() {
+        for i in 0..=self.ref_upper_bound() {
             if self.ref_is_value() {
                 return Ok((self, i));
             }
