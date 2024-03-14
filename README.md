@@ -14,7 +14,7 @@ e ::= x         -- variable
 
 The general roadmap of this tutorial is as follows, of course, it's under construction. (especially for type system and corresponding handouts)
 
-- **day 1 ([handout](https://zhihu.com) available)**: you will learn the basic **syntax** of the language with the design of how to embed our (currently) untyped lambda calculus using `Rust Enum`, do some simple encoding exercises, while also having the chance to add more syntax rules yourself (and of course, play with them).
+- **day 1 ([handout](https://zhuanlan.zhihu.com/p/685876438) available)**: you will learn the basic **syntax** of the language with the design of how to embed our (currently) untyped lambda calculus using `Rust Enum`, do some simple encoding exercises, while also having the chance to add more syntax rules yourself (and of course, play with them).
 
 - **day 2**: you will learn about the **semantic** of utlc, as well as the operational **rules** we will use throughout this tutorial, after which you also need to implement three useful utility functions that can help you do better in day 3. 
 
