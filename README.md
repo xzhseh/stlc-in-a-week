@@ -38,7 +38,7 @@ Typically you could use this frontend to **interactively** (and that's why I'm n
 
 It's still under heavy development (and refactor), I'll bring fancier features in the future - the ultimate goal is to create a ghci-like interactive interpreter for stlc.
 
-Below is a **demo** gif using the built-in interactive environment to play with my (i.e., reference solutions) stlc implementation.
+Below is a **demo** gif using the built-in interactive environment to play with my (i.e., reference solutions) stlc implementation. (p.s. it is evaluating `(λx. λy. incr y) ω 114513` via call-by-name)
 
 ![demo](img/demo.gif)
 
@@ -56,7 +56,7 @@ cargo test --test <specific day>
 
 ### Reference Solutions
 
-I have provide all my reference solutions for this tutorial from `day1` to `day4`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
+I have provide all my reference solutions for this tutorial from `day1` to `day3`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
 
 ### Credit
 
