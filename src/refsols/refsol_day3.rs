@@ -120,28 +120,14 @@ impl Exp {
         }
     }
 
-    /// TODO(Day3-Q1): Write a *helper* function that evaluate *one* step
-    /// further using call-by-value evaluation strategy for the given expression
-    /// ----
-    /// Hint: whenever you stuck, consider review the three operational rules
-    /// for call-by-value in the handout, and check if your implementation
-    /// accurately follows the rules
     pub fn ref_eval_one_step_cbv(self) -> Result<Exp> {
         self.eval(Strategy::CallByValue)
     }
 
-    /// TODO(Day3-Q2): Same as what we have done for cbv,
-    /// it's time to implement the same *helper* function for call-by-name!
-    /// ----
-    /// Hint: the operational rules are your best friends
     pub fn ref_eval_one_step_cbn(self) -> Result<Exp> {
         self.eval(Strategy::CallByName)
     }
 
-    /// TODO(Day3-Q3): Write a "driver" function to evaluate the given expression
-    /// exactly the given steps, so that we don't need to manually evaluate it step by step.
-    /// Of course, you need to distinguish between different evaluation strategies.
-    /// This would be *especially* useful when we are dealing with yCombinator later.
     pub fn ref_eval_multi_step(mut self, step: u32, strategy: Strategy) -> Result<Exp> {
         for _ in 0..step {
             self = match strategy {
@@ -152,16 +138,10 @@ impl Exp {
         Ok(self)
     }
 
-    /// TODO(Day3-Q4'): Choose your favorite upper bound number of evalutation steps
-    /// when evaluating the corresponding expression to its normal form.
     fn ref_upper_bound(&self) -> u32 {
         1000000
     }
 
-    /// TODO(Day3-Q4): Write a function to help reduce the current expression
-    /// to its normal form under the specified strategy.
-    /// Note: instead of the expression, you should also return how many *steps*
-    /// you have taken to evaluate the given expression to its normal form.
     pub fn ref_eval_to_normal_form(mut self, strategy: Strategy) -> Result<(Exp, u32)> {
         for i in 1..=self.ref_upper_bound() {
             if self.is_value() {
