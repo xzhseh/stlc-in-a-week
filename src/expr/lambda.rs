@@ -3,7 +3,7 @@ use core::fmt;
 use crate::Exp;
 
 /// The actual representation of a lambda abstraction.
-/// e.g., `\x. t` would be represents as `Lambda { arg: "x", exp: Exp }`
+/// e.g., `λx. t` would be represents as `Lambda { arg: "x", exp: Exp }`
 /// Note: This abstraction is probably the *most* important base for our stlc.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Lambda {

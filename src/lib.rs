@@ -13,7 +13,7 @@ pub mod stlc_err;
 pub enum Exp {
     /// Variable, which literally could be anything!
     Var(String),
-    /// Lambda abstraction, probably the most important base for our stlc, i.e., \x. t
+    /// Lambda abstraction, probably the most important base for our stlc, i.e., λx. t
     Lambda(Box<Lambda>),
     /// Application, i.e., t1 t2
     App(Box<App>),
@@ -25,11 +25,11 @@ pub enum Exp {
     False,
     /// Non-negative number, i.e., n
     Nat(u32),
-    /// IsZero, think of this as a special application expression, i.e., IsZero t
+    /// IsZero, think of this as a *special* lambda abstraction (function), i.e., IsZero t
     IsZero(Box<Exp>),
-    /// Increment, i.e., inc exp
+    /// Increment, i.e., incr exp
     Incr(Box<Exp>),
-    /// Decrement, i.e., dec exp
+    /// Decrement, i.e., decr exp
     Decr(Box<Exp>),
     // TODO(Day1-Q2): Add your self-defined syntax here.
     // Feel free to play with it in `main.rs` and encoding it just

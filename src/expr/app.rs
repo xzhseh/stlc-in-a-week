@@ -3,7 +3,7 @@ use core::fmt;
 use crate::Exp;
 
 /// Treat this as a function application.
-/// In general `t1` should be an arrow type (i.e., t1 :: a -> a),
+/// In general `t1` should be an *arrow* type (i.e., t1 :: a -> a),
 /// which in our case is a lambda abstraction.
 /// And of course, `t2` could literally be anything that is *valid*.
 #[derive(Debug, Clone, Eq, PartialEq)]
