@@ -20,8 +20,8 @@ impl Exp {
                         // -----------------------
                         // (\x. t) v -> [x := v] t
                         Exp::Lambda(lambda) => {
-                            if app.t2.is_value() {
-                                Ok(lambda.exp.substitute(lambda.arg, app.t2))
+                            if app.t2.ref_is_value() {
+                                Ok(lambda.exp.ref_substitute(lambda.arg, app.t2))
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1, app.t2.eval(strategy)?))))
                             }
@@ -30,7 +30,7 @@ impl Exp {
                         // ---------------
                         // t1 t2 -> t1' t2
                         _ => {
-                            if app.t1.is_value() {
+                            if app.t1.ref_is_value() {
                                 return Err(StlcError::StuckExpressionCbv(format!("{}", self)));
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1.eval(strategy)?, app.t2))))
@@ -46,12 +46,12 @@ impl Exp {
                         // Every other rule is essentially the same
                         // -----------------------
                         // (\x. t1) t2  -> [x := t2] t1
-                        Exp::Lambda(lambda) => Ok(lambda.exp.substitute(lambda.arg, app.t2)),
+                        Exp::Lambda(lambda) => Ok(lambda.exp.ref_substitute(lambda.arg, app.t2)),
                         //    t1 -> t1'
                         // ---------------
                         // t1 t2 -> t1' t2
                         _ => {
-                            if app.t1.is_value() {
+                            if app.t1.ref_is_value() {
                                 return Err(StlcError::StuckExpressionCbn(format!("{}", self)));
                             } else {
                                 Ok(Exp::App(Box::new(App::new(app.t1.eval(strategy)?, app.t2))))
@@ -71,7 +71,7 @@ impl Exp {
                 // -----------------------------------------------
                 // if t1 then t2 else t3 -> if t1' then t2 else t3
                 _ => {
-                    if cond.r#if.is_value() {
+                    if cond.r#if.ref_is_value() {
                         return Err(StlcError::InvalidExpression(
                             format!("expect if clause not to be values other than `true` or `false, actual: {}", cond.r#if)
                         ));
@@ -144,7 +144,7 @@ impl Exp {
 
     pub fn ref_eval_to_normal_form(mut self, strategy: Strategy) -> Result<(Exp, u32)> {
         for i in 1..=self.ref_upper_bound() {
-            if self.is_value() {
+            if self.ref_is_value() {
                 return Ok((self, i));
             }
             self = match strategy {
