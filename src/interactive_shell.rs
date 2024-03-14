@@ -219,8 +219,16 @@ fn parse(mut lhs: String, curr: String, rhs: String) -> Exp {
 fn print_statistics(duration: Duration, steps: u32) {
     println!("\n{}", "statistics".bold());
     println!("----");
-    println!("{}:  {} ms", "time".green(), duration.as_millis().to_string().underline());
-    println!("{}: {} steps", "steps".green(), steps.to_string().underline());
+    println!(
+        "{}:  {} ms",
+        "time".green(),
+        duration.as_millis().to_string().underline()
+    );
+    println!(
+        "{}: {} steps",
+        "steps".green(),
+        steps.to_string().underline()
+    );
     println!("----");
 }
 
@@ -312,7 +320,7 @@ pub fn start_interactive_shell() {
         );
         let start = Instant::now();
         let result = if flag {
-            exp.clone().ref_eval_to_normal_form(eval_strategy)
+            exp.clone().eval_to_normal_form(eval_strategy)
         } else {
             exp.clone().ref_eval_to_normal_form(eval_strategy)
         };
