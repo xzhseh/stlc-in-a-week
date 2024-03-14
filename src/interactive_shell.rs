@@ -9,6 +9,7 @@ use spin::Mutex;
 use std::{
     collections::BTreeSet,
     io::{self, Write},
+    time::{Duration, Instant},
 };
 
 lazy_static! {
@@ -215,6 +216,14 @@ fn parse(mut lhs: String, curr: String, rhs: String) -> Exp {
     }
 }
 
+fn print_statistics(duration: Duration, steps: u32) {
+    println!("\n{}", "statistics".bold());
+    println!("----");
+    println!("{}:  {} ms", "time".green(), duration.as_millis().to_string().underline());
+    println!("{}: {} steps", "steps".green(), steps.to_string().underline());
+    println!("----");
+}
+
 pub fn start_interactive_shell() {
     println!("Congratulations, the program compiles.");
     println!(
@@ -266,16 +275,56 @@ pub fn start_interactive_shell() {
                 }
             }
         }
+        println!("\ndo you wish to use official or your own evaluation implementation?");
         println!(
-            "\nstart evaluating {} to normal form by {}.",
-            exp.to_string().underline(),
-            eval_strategy.to_string().green().underline().bold()
+            "(note: please implement `{}` before choosing your own.",
+            "eval_to_normal_form".to_string().underline()
         );
-        match exp.clone().eval_to_normal_form(eval_strategy) {
-            Ok(res) => print_out(
-                res.to_string().underline().bold().green(),
-                Color::BrightBlue,
+        println!("\n1. {} 2. {}", "official".green(), "your own".green());
+        print_prompt();
+        let mut flag = false;
+        loop {
+            let input = read_line();
+            match input.as_str() {
+                "1" => break,
+                "2" => {
+                    flag = true;
+                    break;
+                }
+                _ => {
+                    print_out("please type the correct number.".into(), Color::Red);
+                    continue;
+                }
+            }
+        }
+        println!(
+            "\nstart evaluating {} to normal form by {} using {}.",
+            exp.to_string().underline(),
+            eval_strategy.to_string().green().underline().bold(),
+            format!(
+                "{} implementation",
+                if flag {
+                    "your own".underline()
+                } else {
+                    "official".underline()
+                }
             ),
+        );
+        let start = Instant::now();
+        let result = if flag {
+            exp.clone().ref_eval_to_normal_form(eval_strategy)
+        } else {
+            exp.clone().ref_eval_to_normal_form(eval_strategy)
+        };
+        let duration = start.elapsed();
+        match result {
+            Ok((res, steps)) => {
+                print_out(
+                    res.to_string().underline().bold().green(),
+                    Color::BrightBlue,
+                );
+                print_statistics(duration, steps);
+            }
             Err(err) => {
                 let output = format!(
                     "failed to evaluate {}, error: {}",

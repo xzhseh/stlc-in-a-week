@@ -153,16 +153,19 @@ impl Exp {
     }
 
     /// TODO(Day3-Q4'): Choose your favorite upper bound number of evalutation steps
+    /// when evaluating the corresponding expression to its normal form.
     fn upper_bound(&self) -> u32 {
         114514
     }
 
     /// TODO(Day3-Q4): Write a function to help reduce the current expression
     /// to its normal form under the specified strategy.
-    pub fn eval_to_normal_form(mut self, strategy: Strategy) -> Result<Exp> {
-        for _ in 0..self.upper_bound() {
+    /// Note: instead of the expression, you should also return how many *steps*
+    /// you have taken to evaluate the given expression to its normal form.
+    pub fn ref_eval_to_normal_form(mut self, strategy: Strategy) -> Result<(Exp, u32)> {
+        for i in 1..=self.upper_bound() {
             if self.is_value() {
-                return Ok(self);
+                return Ok((self, i));
             }
             self = match strategy {
                 Strategy::CallByValue => self.eval_one_step_cbv()?,
