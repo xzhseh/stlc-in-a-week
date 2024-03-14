@@ -233,7 +233,7 @@ fn print_statistics(duration: Duration, steps: u32) {
 }
 
 pub fn start_interactive_shell() {
-    println!("Congratulations, the program compiles.");
+    println!("\nCongratulations, the program compiles.");
     println!(
         "{}",
         format!(
