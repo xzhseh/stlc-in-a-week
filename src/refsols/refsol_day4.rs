@@ -97,6 +97,36 @@ impl YCombinator {
         )
     }
 
+    /// eq 1 1 -> true;
+    /// eq 2 3 -> false;
+    pub fn ref_gen_built_in_equal() -> Exp {
+        Lambda::build(
+            "rec",
+            Lambda::build(
+                "x",
+                Lambda::build(
+                    "y",
+                    Cond::build(
+                        Cond::build(
+                            IsZero::build(Var::build("x")),
+                            Exp::True,
+                            IsZero::build(Var::build("y")),
+                        ),
+                        Cond::build(
+                            IsZero::build(Var::build("x")),
+                            IsZero::build(Var::build("y")),
+                            Exp::False,
+                        ),
+                        App::build(
+                            App::build(Var::build("rec"), Decr::build(Var::build("x"))),
+                            Decr::build(Var::build("y")),
+                        ),
+                    ),
+                ),
+            ),
+        )
+    }
+
     fn ref_build_eval_expr(&self, inputs: Vec<Exp>) -> Exp {
         let mut e = App::build(self.y.clone(), self.f.clone());
         for input in inputs {
