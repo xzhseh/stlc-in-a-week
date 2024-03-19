@@ -61,6 +61,8 @@ impl YCombinator {
 
     /// Yes, just a simple times function, e.g., 10 * 30 == 300
     /// this will be used as the payload function, i.e., f
+    /// note that the input parameters for `(times x y)`
+    /// should be `Y F x x y`
     pub fn ref_gen_built_in_times() -> Exp {
         Lambda::build(
             "rec",
@@ -99,6 +101,7 @@ impl YCombinator {
 
     /// eq 1 1 -> true;
     /// eq 2 3 -> false;
+    /// e.g., Y F x y
     pub fn ref_gen_built_in_equal() -> Exp {
         Lambda::build(
             "rec",
