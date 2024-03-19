@@ -56,7 +56,7 @@ cargo test --test <specific day>
 
 ### Reference Solutions
 
-I have provide all my reference solutions for this tutorial from `day1` to `day3`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
+I have provide all my reference solutions for this tutorial from `day1` to `day4`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
 
 ### Credit
 
