@@ -28,7 +28,7 @@ impl Exp {
     /// Hint: a stuck expression is something that can not be evaluated further
     /// using any of the operational rules we have defined, and is also
     /// not a *value*. (yes, `is_value` should be of help)
-    pub fn is_stuck(&self) -> bool {
+    pub fn is_stuck(&self, _strategy: Strategy) -> bool {
         todo!()
     }
 }
@@ -57,6 +57,8 @@ impl YCombinator {
         Self { y, f }
     }
 
+    /// Yes, just a simple times function, e.g., 10 * 30 == 300
+    /// this will be used as the payload function, i.e., f
     pub fn gen_built_in_times() -> Exp {
         Lambda::build(
             "rec",
@@ -102,6 +104,7 @@ impl YCombinator {
         e
     }
 
+    /// TODO(Day4-Q6): Evaluate your packed yCombinator with the specific inputs to *normal form*
     pub fn eval(self, inputs: Vec<Exp>, strategy: Strategy) -> Result<(Exp, u32)> {
         let e = self.build_eval_expr(inputs);
         let (result, steps) = e.ref_eval_to_normal_form(strategy)?;
