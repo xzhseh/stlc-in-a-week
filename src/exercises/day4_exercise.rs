@@ -1,10 +1,4 @@
-use crate::{
-    expr::{
-        app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda, var::Var,
-    },
-    stlc_err::StlcError,
-    Exp, Strategy,
-};
+use crate::{stlc_err::StlcError, Exp, Strategy};
 
 type Result<T> = std::result::Result<T, StlcError>;
 
@@ -21,33 +15,15 @@ impl Exp {
     /// that will *grow* larger after each evaluation step?
     /// Write the expression down and evaluate it here to prove your answer.
     pub fn grow_omega() -> ! {
-        // (λx. x x x) (λ. x x x)
-        let e = Lambda::build(
-            "x",
-            App::build(
-                App::build(Var::build("x"), Var::build("x")),
-                Var::build("x"),
-            ),
-        );
-        let _grow_omega = App::build(e.clone(), e);
-        loop {}
+        todo!()
     }
 
     /// TODO(Day4-Q3): Write a function to determine if the current expression gets stuck.
     /// Hint: a stuck expression is something that can not be evaluated further
     /// using any of the operational rules we have defined, and is also
     /// not a *value*. (yes, `is_value` should be of help)
-    pub fn is_stuck(&self, strategy: Strategy) -> bool {
-        match strategy {
-            Strategy::CallByValue => {
-                let e = self.clone().eval_one_step_cbv().unwrap();
-                e == self.clone()
-            }
-            Strategy::CallByName => {
-                let e = self.clone().eval_one_step_cbn().unwrap();
-                e == self.clone()
-            }
-        }
+    pub fn is_stuck(&self, _strategy: Strategy) -> bool {
+        todo!()
     }
 }
 
@@ -62,70 +38,23 @@ pub struct YCombinator {
 
 impl YCombinator {
     /// TODO(Day4-Q4): Initialize the driver function of yCombinator here
-    pub fn new(f: Exp) -> Self {
-        // λF. (λx. F (x x)) (λx. F (x x))
-        let e = Lambda::build(
-            "x",
-            App::build(
-                Var::build("F"),
-                App::build(Var::build("x"), Var::build("x")),
-            ),
-        );
-        let y = Lambda::build("F", App::build(e.clone(), e));
-        Self { y, f }
+    pub fn new(_f: Exp) -> Self {
+        todo!()
     }
 
     /// Yes, just a simple times function, e.g., 10 * 30 == 300
     /// this will be used as the payload function, i.e., f
     pub fn gen_built_in_times() -> Exp {
-        Lambda::build(
-            "rec",
-            Lambda::build(
-                "x",
-                Lambda::build(
-                    "y",
-                    Lambda::build(
-                        "z",
-                        Cond::build(
-                            IsZero::build(Var::build("z")),
-                            0.into(),
-                            Cond::build(
-                                IsZero::build(Var::build("y")),
-                                App::build(
-                                    App::build(
-                                        App::build(Var::build("rec"), Var::build("x")),
-                                        Var::build("x"),
-                                    ),
-                                    Decr::build(Var::build("z")),
-                                ),
-                                Incr::build(App::build(
-                                    App::build(
-                                        App::build(Var::build("rec"), Var::build("x")),
-                                        Decr::build(Var::build("y")),
-                                    ),
-                                    Var::build("z"),
-                                )),
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        )
+        todo!()
     }
 
     /// TODO(Day4-Q5): Build your to-be-evaluated expression here
-    fn build_eval_expr(&self, inputs: Vec<Exp>) -> Exp {
-        let mut e = App::build(self.y.clone(), self.f.clone());
-        for input in inputs {
-            e = App::build(e, input);
-        }
-        e
+    pub fn build_eval_expr(&self, _inputs: Vec<Exp>) -> Exp {
+        todo!()
     }
 
     /// TODO(Day4-Q6): Evaluate your packed yCombinator with the specific inputs to *normal form*
-    pub fn eval(self, inputs: Vec<Exp>, strategy: Strategy) -> Result<(Exp, u32)> {
-        let e = self.build_eval_expr(inputs);
-        let (result, steps) = e.ref_eval_to_normal_form(strategy)?;
-        Ok((result, steps))
+    pub fn eval(self, _inputs: Vec<Exp>, _strategy: Strategy) -> Result<(Exp, u32)> {
+        todo!()
     }
 }
