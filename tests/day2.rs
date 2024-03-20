@@ -1,6 +1,6 @@
 use stlc::{
     exercises::day2_exercise::ValidExpressions,
-    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, lambda::Lambda, var::Var},
+    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda, var::Var},
     Exp,
 };
 
@@ -140,13 +140,53 @@ fn test_substitute_basic() {
         z.clone(),
         Exp::App(Box::new(App::new(Exp::Var(z.clone()), Exp::Var(x.clone())))),
     )));
-
     let result = Exp::Lambda(Box::new(Lambda::new(
         z.clone(),
         Exp::App(Box::new(App::new(Exp::Var(z.clone()), s.clone()))),
     )));
-
     assert_eq!(exp4.substitute(x.clone(), s.clone()), result);
+
+    // [x := s] (incr x) => (incr s)
+    let exp5 = Incr::build(Var::build("x"));
+    assert_eq!(exp5.substitute(x.clone(), s.clone()), Incr::build(114514.into()));
+
+    // [x := s] (decr x) => (decr s)
+    let exp6 = Decr::build(Var::build("x"));
+    assert_eq!(exp6.substitute(x.clone(), s.clone()), Incr::build(114514.into()));
+
+    // [x := s] true => true
+    let exp7 = Exp::True;
+    assert_eq!(exp7.substitute(x.clone(), s.clone()), Exp::True);
+
+    // [x := s] false => false 
+    let exp7 = Exp::True;
+    assert_eq!(exp7.substitute(x.clone(), s.clone()), Exp::True);
+
+    // [x := s] n => n
+    let exp7: Exp = 1919810.into();
+    assert_eq!(exp7.substitute(x.clone(), s.clone()), 1919810.into());
+
+    // [x := s] IsZero x => IsZero s
+    let exp8 = IsZero::build(Var::build("x"));
+    assert_eq!(exp8.substitute(x.clone(), s.clone()), IsZero::build(114514.into()));
+
+    // [x := s] (if (incr x) then (decr x) else (is_zero x)) = if (incr s) then (decr s) else (is_zero s)
+    let exp9 = Cond::build(
+        Incr::build(Var::build("x")),
+        Decr::build(Var::build("x")),
+        IsZero::build(Var::build("x")),
+    );
+    let result = Cond::build(
+        Incr::build(114514.into()),
+        Decr::build(114514.into()),
+        IsZero::build(114514.into()),
+    );
+    assert_eq!(exp9.substitute(x.clone(), s.clone()), result);
+}
+
+#[test]
+fn test_substitute_hard() {
+    todo!()
 }
 
 #[test]
