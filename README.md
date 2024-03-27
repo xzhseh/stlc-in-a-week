@@ -22,7 +22,7 @@ The general roadmap of this tutorial is as follows, of course, it's under constr
 
 - **day 1 ([handout](https://zhuanlan.zhihu.com/p/685876438) available)**: you will learn the basic **syntax** of the language with the design of how to embed our (currently) untyped lambda calculus using `Rust Enum`, do some simple encoding exercises, while also having the chance to add more syntax rules yourself (and of course, play with them).
 
-- **day 2**: you will learn about the **semantic** of utlc, as well as the operational **rules** we will use throughout this tutorial, after which you also need to implement three useful utility functions that can help you do better in day 3. 
+- **day 2 ([handout](https://zhuanlan.zhihu.com/p/688690857) available)**: you will learn about the **semantic** of utlc, as well as the operational **rules** we will use throughout this tutorial, after which you also need to implement three useful utility functions that can help you do better in day 3. 
 
 - **day 3**: you will first learn about two **evaluation strategies**, call-by-value and call-by-name. after this you will start to implement the core part of the first half of our tutorial - to achieve the ability to actually evaluate / interpret / use the untyped lambda calculus we have seen so far. (and a little spoiler here: I **promise** this would be a lot of fun)
 
