@@ -82,7 +82,8 @@ impl ValidExpressions {
         todo!()
     }
 
-    /// TODO(Day1-Q3): `if 1 then true else false`
+    /// TODO(Day2-Q4): `if 1 then true else false`
+    /// hint: we do *not* have type system yet
     pub fn q3() -> (bool, &'static str) {
         todo!()
     }

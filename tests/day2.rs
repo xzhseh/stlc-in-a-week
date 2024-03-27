@@ -152,7 +152,7 @@ fn test_substitute_basic() {
 
     // [x := s] (decr x) => (decr s)
     let exp6 = Decr::build(Var::build("x"));
-    assert_eq!(exp6.substitute(x.clone(), s.clone()), Incr::build(114514.into()));
+    assert_eq!(exp6.substitute(x.clone(), s.clone()), Decr::build(114514.into()));
 
     // [x := s] true => true
     let exp7 = Exp::True;
@@ -182,11 +182,6 @@ fn test_substitute_basic() {
         IsZero::build(114514.into()),
     );
     assert_eq!(exp9.substitute(x.clone(), s.clone()), result);
-}
-
-#[test]
-fn test_substitute_hard() {
-    todo!()
 }
 
 #[test]
