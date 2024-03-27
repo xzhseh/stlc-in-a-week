@@ -1,5 +1,11 @@
 ## Write a simply-typed lambda calculus (in Rust!) in a week
 
+### Credit
+
+This tutorial is initially inspired by the **great** programming language course project (originally written in Haskell) provided by [Prof. Delaware](https://www.cs.purdue.edu/homes/bendy/) at purdue university.
+
+It's fun to learn (and write) Haskell, but I love Rust more.
+
 ### Introduction
 
 This tutorial aims at guiding you to implement a (fairly simple) functional programming language embedded in Rust (as a DSL) within a week.
@@ -57,9 +63,3 @@ cargo test --test <specific day>
 ### Reference Solutions
 
 I have provide all my reference solutions for this tutorial from `day1` to `day4`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
-
-### Credit
-
-This tutorial is initially inspired by the **great** programming language course project (originally written in Haskell) provided by [Prof. Delaware](https://www.cs.purdue.edu/homes/bendy/) at purdue university.
-
-It's fun to learn (and write) Haskell, but I love Rust more.
