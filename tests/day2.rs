@@ -1,6 +1,8 @@
 use stlc::{
     exercises::day2_exercise::ValidExpressions,
-    expr::{app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda, var::Var},
+    expr::{
+        app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda, var::Var,
+    },
     Exp,
 };
 
@@ -148,17 +150,23 @@ fn test_substitute_basic() {
 
     // [x := s] (incr x) => (incr s)
     let exp5 = Incr::build(Var::build("x"));
-    assert_eq!(exp5.substitute(x.clone(), s.clone()), Incr::build(114514.into()));
+    assert_eq!(
+        exp5.substitute(x.clone(), s.clone()),
+        Incr::build(114514.into())
+    );
 
     // [x := s] (decr x) => (decr s)
     let exp6 = Decr::build(Var::build("x"));
-    assert_eq!(exp6.substitute(x.clone(), s.clone()), Decr::build(114514.into()));
+    assert_eq!(
+        exp6.substitute(x.clone(), s.clone()),
+        Decr::build(114514.into())
+    );
 
     // [x := s] true => true
     let exp7 = Exp::True;
     assert_eq!(exp7.substitute(x.clone(), s.clone()), Exp::True);
 
-    // [x := s] false => false 
+    // [x := s] false => false
     let exp7 = Exp::True;
     assert_eq!(exp7.substitute(x.clone(), s.clone()), Exp::True);
 
@@ -168,7 +176,10 @@ fn test_substitute_basic() {
 
     // [x := s] IsZero x => IsZero s
     let exp8 = IsZero::build(Var::build("x"));
-    assert_eq!(exp8.substitute(x.clone(), s.clone()), IsZero::build(114514.into()));
+    assert_eq!(
+        exp8.substitute(x.clone(), s.clone()),
+        IsZero::build(114514.into())
+    );
 
     // [x := s] (if (incr x) then (decr x) else (is_zero x)) = if (incr s) then (decr s) else (is_zero s)
     let exp9 = Cond::build(
