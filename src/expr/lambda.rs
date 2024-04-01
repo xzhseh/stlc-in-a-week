@@ -1,6 +1,6 @@
 use core::fmt;
 
-use crate::Exp;
+use crate::{type_::Type, Exp};
 
 /// The actual representation of a lambda abstraction.
 /// e.g., `λx. t` would be represents as `Lambda { arg: "x", exp: Exp }`
@@ -9,19 +9,36 @@ use crate::Exp;
 pub struct Lambda {
     pub arg: String,
     pub exp: Exp,
+    /// represents if the current `Exp`
+    /// is typed or untyped.
+    /// note: this *must be consistent*
+    /// across the entire `Exp`.
+    pub ty: Option<Type>,
 }
 
 impl Lambda {
     pub fn new(arg: String, exp: Exp) -> Self {
-        Self { arg, exp }
+        Self { arg, exp, ty: None }
+    }
+
+    pub fn new_with_type(arg: String, exp: Exp, ty: Type) -> Self {
+        Self {
+            arg,
+            exp,
+            ty: Some(ty),
+        }
     }
 
     pub fn new_with_box(arg: String, exp: Exp) -> Box<Self> {
-        Box::new(Self { arg, exp })
+        Box::new(Self { arg, exp, ty: None })
     }
 
     pub fn build(arg: &str, exp: Exp) -> Exp {
         Self::new(arg.into(), exp).into()
+    }
+
+    pub fn build_with_type(arg: &str, exp: Exp, ty: Type) -> Exp {
+        Self::new_with_type(arg.into(), exp, ty).into()
     }
 }
 

@@ -42,6 +42,7 @@ impl Exp {
                     appears_free_in_inner(*e, var, context)
                 }
                 Exp::Nat(_) | Exp::True | Exp::False => false,
+                Exp::Add(_) => panic!("day1 to day4 will not involve add expression"),
             }
         }
 
