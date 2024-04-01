@@ -21,3 +21,6 @@ pub mod nat;
 
 /// variable
 pub mod var;
+
+/// add expression
+pub mod add;
