@@ -40,6 +40,11 @@ impl Lambda {
     pub fn build_with_type(arg: &str, exp: Exp, ty: Type) -> Exp {
         Self::new_with_type(arg.into(), exp, ty).into()
     }
+
+    /// whether the current lambda exp is typed or not.
+    pub fn typed(&self) -> bool {
+        self.ty.is_some()
+    }
 }
 
 impl From<Lambda> for Exp {
