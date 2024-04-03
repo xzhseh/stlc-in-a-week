@@ -101,6 +101,10 @@ impl Env {
         self.0.insert(key, ty)
     }
 
+    pub fn remove(&mut self, key: String) -> Option<Type> {
+        self.0.remove(&key)
+    }
+
     pub fn lookup(&self, key: String) -> Option<Type> {
         self.0.get(&key).cloned()
     }

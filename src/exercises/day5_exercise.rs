@@ -53,12 +53,53 @@ impl Exp {
     /// hint: a `ty_check_inner` helper function may be of help
     /// - since we need to start with an empty context (i.e., Env).
     pub fn ty_check(&self, ty: Type) -> bool {
-        self.ty_check_inner(ty, Env::new())
+        self.ty_check_inner(ty, &mut Env::new())
     }
 
-    fn ty_check_inner(&self, ty: Type, context: Env) -> bool {
-        match ty.clone() {
-            
+    fn ty_check_inner(&self, ty: Type, context: &mut Env) -> bool {
+        match self.clone() {
+            // t-true & t-false
+            Self::True | Self::False => ty.is_bool(),
+            // t-if
+            Self::Cond(cond) => {
+                cond.r#if.ty_check_inner(Type::TBool, context)
+                    && cond.r#then.ty_check_inner(ty.clone(), context)
+                    && cond.r#else.ty_check_inner(ty, context)
+            }
+            // t-abs
+            Self::Lambda(lambda) => {
+                // sanity check
+                assert_eq!(lambda.typed(), true, "expect `lambda` to be typed");
+                let Type::TArrow(t) = ty else {
+                    return false;
+                };
+                let first = lambda.get_type_unchecked() == t.ty1;
+                // short circuit check
+                if !first {
+                    return false;
+                }
+                context.insert(lambda.arg.clone(), t.ty1);
+                let second = lambda.exp.ty_check_inner(t.ty2, context);
+                // subsequent type check should not be affected
+                context.remove(lambda.arg.clone());
+                first && second
+            }
+            // t-app - a.k.a. the "fancy" type inference goes here
+            Self::App(_app) => todo!(),
+            // t-var
+            Self::Var(v) => context.lookup(v).unwrap_or(Type::TDummy) == ty,
+            // t-num
+            Self::Nat(_) => ty.is_int(),
+            // t-add
+            Self::Add(add) => {
+                if !ty.is_int() {
+                    return false;
+                }
+                add.t1.ty_check_inner(Type::TInt, context)
+                    && add.t2.ty_check_inner(Type::TInt, context)
+            }
+            // every other will return false
+            _ => false,
         }
     }
 }

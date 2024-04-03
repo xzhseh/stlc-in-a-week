@@ -45,6 +45,11 @@ impl Lambda {
     pub fn typed(&self) -> bool {
         self.ty.is_some()
     }
+
+    /// used after `typed` return true.
+    pub fn get_type_unchecked(&self) -> Type {
+        self.ty.clone().unwrap()
+    }
 }
 
 impl From<Lambda> for Exp {
