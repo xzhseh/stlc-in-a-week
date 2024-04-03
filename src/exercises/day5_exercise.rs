@@ -57,6 +57,8 @@ impl Exp {
     }
 
     fn ty_check_inner(&self, ty: Type, context: Env) -> bool {
-        todo!()
+        match ty.clone() {
+            
+        }
     }
 }
