@@ -1,6 +1,8 @@
 use core::fmt;
+use std::collections::HashMap;
 
 use expr::{add::Add, app::App, cond::Cond, lambda::Lambda};
+use type_::Type;
 
 pub mod exercises;
 pub mod expr;
@@ -82,5 +84,24 @@ impl fmt::Display for Strategy {
             Strategy::CallByValue => write!(f, "call-by-value"),
             Strategy::CallByName => write!(f, "call-by-name"),
         }
+    }
+}
+
+/// the context for type check (and infer).
+/// note: used after day5.
+#[derive(Clone, Debug)]
+pub struct Env(HashMap<String, Type>);
+
+impl Env {
+    pub fn new() -> Self {
+        Self(HashMap::new())
+    }
+
+    pub fn insert(&mut self, key: String, ty: Type) -> Option<Type> {
+        self.0.insert(key, ty)
+    }
+
+    pub fn lookup(&self, key: String) -> Option<Type> {
+        self.0.get(&key).cloned()
     }
 }

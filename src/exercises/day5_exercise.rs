@@ -1,4 +1,4 @@
-use crate::{type_::Type, Exp};
+use crate::{type_::Type, Env, Exp};
 
 impl Exp {
     /// TODO(Day5-Q1): check if the current expression
@@ -32,7 +32,7 @@ impl Exp {
     /// you could use this when implementing `ty_check`.
     /// [1] for some definition of useful.
     #[allow(dead_code)]
-    fn ty_infer_(&self) -> Type {
+    fn ty_infer_(&self, _context: &Env) -> Type {
         todo!()
     }
 
@@ -49,7 +49,14 @@ impl Exp {
     /// ----
     /// (λx. 114514 + x).ty_check(int -> int) === true
     /// ----
-    pub fn ty_check(&self, _ty: Type) -> bool {
+    ///
+    /// hint: a `ty_check_inner` helper function may be of help
+    /// - since we need to start with an empty context (i.e., Env).
+    pub fn ty_check(&self, ty: Type) -> bool {
+        self.ty_check_inner(ty, Env::new())
+    }
+
+    fn ty_check_inner(&self, ty: Type, context: Env) -> bool {
         todo!()
     }
 }
