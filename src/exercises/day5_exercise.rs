@@ -44,7 +44,11 @@ impl Exp {
             Self::True | Self::False | Self::IsZero(_) => Some(Type::TBool),
             Self::Incr(_) | Self::Decr(_) | Self::Add(_) | Self::Nat(_) => Some(Type::TInt),
             Self::Cond(cond) => {
-                // todo: should we care about the if clause here?
+                let mut context_1 = context.clone();
+                // if clause should be boolean type
+                if !cond.r#if.ty_check_inner(Type::TBool, &mut context_1) {
+                    return None;
+                }
                 let Some(t1) = cond.r#then.ty_infer(context) else {
                     return None;
                 };
@@ -108,6 +112,7 @@ impl Exp {
     /// ----
     /// (λx. 114514 + x).ty_check(int -> int) === true
     /// ----
+    /// refer to the test cases for more detailed use cases.
     ///
     /// hint: a `ty_check_inner` helper function may be of help;
     /// since we need to start with an empty (mutable) context (i.e., Env).
