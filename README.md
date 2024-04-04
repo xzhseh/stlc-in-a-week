@@ -28,7 +28,9 @@ The general roadmap of this tutorial is as follows, of course, it's under constr
 
 - **day 4**: it's time to introduce some "**spicier**" features into our utlc, which is the ability of "seemingly" performing **recursion**; to achieve this, we will utilize `yCombinator`, and don't worry, you will learn how it works when we get there.
 
-- **[WIP] day 5-7**: introduce a **sound** type systems and make our untyped lambda calulus typed.
+- **day 5**: at this very moment, let's make our untyped lambda calculus typed - well of course, by introducing types. plus, you will learn how to conduct a **bidirectional** type check and inference on the upgraded simply-typed lambda calculus.
+
+- **[WIP] day 6-7**: the constraint-based type check; and unification.
 
 Regarding official handout(s), currently they are only available (in chinese) on my [zhihu article page](https://www.zhihu.com/people/dawn-36-29-53/posts).
 
@@ -62,4 +64,4 @@ cargo test --test <specific day>
 
 ### Reference Solutions
 
-I have provide all my reference solutions for this tutorial from `day1` to `day4`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
+I have provide all my reference solutions for this tutorial from `day1` to `day5`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
