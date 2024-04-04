@@ -1,4 +1,7 @@
-use crate::{type_::Type, Env, Exp};
+use crate::{
+    type_::{tarrow::TArrow, Type},
+    Env, Exp,
+};
 
 impl Exp {
     /// TODO(Day5-Q1): check if the current expression
@@ -30,10 +33,66 @@ impl Exp {
 
     /// the potentially useful [1] type inference function,
     /// you could use this when implementing `ty_check`.
-    /// [1] for some definition of useful.
+    ///
+    /// [1] of course, for some definition of useful.
     #[allow(dead_code)]
-    fn ty_infer_(&self, _context: &Env) -> Type {
-        todo!()
+    fn ty_infer(&self, context: &Env) -> Option<Type> {
+        // before actually beginning the inference, try think two questions first:
+        // 1. what kind of exp could be presumably inferred *based on the context*?
+        // 2. and in what case will `ty_infer` be invoked?
+        match self.clone() {
+            Self::True | Self::False | Self::IsZero(_) => Some(Type::TBool),
+            Self::Incr(_) | Self::Decr(_) | Self::Add(_) | Self::Nat(_) => Some(Type::TInt),
+            Self::Cond(cond) => {
+                // todo: should we care about the if clause here?
+                let Some(t1) = cond.r#then.ty_infer(context) else {
+                    return None;
+                };
+                let Some(t2) = cond.r#else.ty_infer(context) else {
+                    return None;
+                };
+                if t1 != t2 {
+                    return None;
+                }
+                Some(t1)
+            }
+            Self::Var(v) => context.lookup(&v),
+            Self::Lambda(lambda) => {
+                // note: we assume `lambda` is typed here -
+                // to make everyone's life easier...
+                assert_eq!(
+                    lambda.typed(),
+                    true,
+                    "expect `lambda` to be typed in `ty_infer`"
+                );
+                let Some(t) = lambda.exp.ty_infer(context) else {
+                    return None;
+                };
+                // t1 -> t2
+                Some(TArrow::build(lambda.get_type_unchecked(), t))
+            }
+            // likely to be the most common case to infer
+            Self::App(app) => {
+                let Some(t1) = app.t1.ty_infer(context) else {
+                    return None;
+                };
+
+                // type of e1 should be arrow type - otherwise it
+                // does not make any sense for an application
+                let Type::TArrow(t) = t1 else {
+                    return None;
+                };
+
+                // do the type check for e2
+                let mut context = context.clone();
+                if !app.t2.ty_check_inner(t.ty1, &mut context) {
+                    return None;
+                }
+
+                // good, now we are done!
+                Some(t.ty2)
+            }
+        }
     }
 
     /// TODO(Day5-Q2): implement the type check function
@@ -50,8 +109,8 @@ impl Exp {
     /// (λx. 114514 + x).ty_check(int -> int) === true
     /// ----
     ///
-    /// hint: a `ty_check_inner` helper function may be of help
-    /// - since we need to start with an empty context (i.e., Env).
+    /// hint: a `ty_check_inner` helper function may be of help;
+    /// since we need to start with an empty (mutable) context (i.e., Env).
     pub fn ty_check(&self, ty: Type) -> bool {
         self.ty_check_inner(ty, &mut Env::new())
     }
@@ -80,14 +139,79 @@ impl Exp {
                 }
                 context.insert(lambda.arg.clone(), t.ty1);
                 let second = lambda.exp.ty_check_inner(t.ty2, context);
-                // subsequent type check should not be affected
+                // subsequent type check should *not* be affected
+                // e.g., Γ ⊢ (λx: TInt. x + 1) + (λy: TInt. y + 1) : TInt
+                // when type check the second term (i.e., λy),
+                // the context with [x -> TInt] should not be visible.
                 context.remove(lambda.arg.clone());
                 first && second
             }
             // t-app - a.k.a. the "fancy" type inference goes here
-            Self::App(_app) => todo!(),
+            Self::App(app) => {
+                // here is where things get excited
+                // the information available: Γ ⊢ e1 e2: T
+
+                match app.t1.clone() {
+                    // 1. if `e1` is arrow type, i.e., lambda abstraction
+                    Self::Lambda(lambda) => {
+                        assert_eq!(lambda.typed(), true, "expect `lambda` to be typed");
+                        let Type::TArrow(t) = ty else {
+                            return false;
+                        };
+                        // we now have *enough* information to type check `e2`
+                        let first = app.t2.ty_check_inner(t.ty1, context);
+                        // short circuit
+                        if !first {
+                            return false;
+                        }
+                        // if `e2` type checks, now we can check the inner expression of lambda
+                        let second = lambda.exp.ty_check_inner(t.ty2, context);
+                        first && second
+                    }
+                    // 2. if `e1` is a variable.
+                    Self::Var(v) => {
+                        // check the current context
+                        match context.lookup(&v) {
+                            Some(t) => {
+                                // we could only accept arrow type here
+                                // otherwise the type will simply not check
+                                let Type::TArrow(t) = t else {
+                                    return false;
+                                };
+                                if t.ty2 != ty {
+                                    return false;
+                                }
+                                app.t2.ty_check_inner(t.ty1, context)
+                            }
+                            None => false,
+                        }
+                    }
+                    // 3. now we arrives at a situation where no *explicit* type information
+                    //    is enough to conduct the type check.
+                    //    what should we do then?
+                    _ => {
+                        // basically the essential problem here, is that the type of `e1`
+                        // is unclear, though we *may* have enough (type) information
+                        // to type check the term.
+                        // so let's infer it based on the context.
+                        let Some(t) = app.t1.ty_infer(&context) else {
+                            return false;
+                        };
+
+                        // once we successfully get the type by inference,
+                        // we can then try to type check the rest.
+                        let Type::TArrow(t) = t else {
+                            return false;
+                        };
+                        if t.ty2 != ty {
+                            return false;
+                        }
+                        app.t2.ty_check_inner(t.ty1, context)
+                    }
+                }
+            }
             // t-var
-            Self::Var(v) => context.lookup(v).unwrap_or(Type::TDummy) == ty,
+            Self::Var(v) => context.lookup(&v).unwrap_or(Type::TDummy) == ty,
             // t-num
             Self::Nat(_) => ty.is_int(),
             // t-add

@@ -105,7 +105,7 @@ impl Env {
         self.0.remove(&key)
     }
 
-    pub fn lookup(&self, key: String) -> Option<Type> {
-        self.0.get(&key).cloned()
+    pub fn lookup(&self, key: &String) -> Option<Type> {
+        self.0.get(key).cloned()
     }
 }
