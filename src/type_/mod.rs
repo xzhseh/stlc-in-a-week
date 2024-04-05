@@ -18,6 +18,45 @@ pub enum Type {
 
     /// yet a boolean type
     TBool,
+
+    /// a dummy type - used when you want to prevent
+    /// conflict in checking
+    TDummy,
+}
+
+/// todo: add a macro to automatically implement all these
+impl Type {
+    pub fn is_var(&self) -> bool {
+        if let Self::TVar(_) = self {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_arrow(&self) -> bool {
+        if let Self::TArrow(_) = self {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_int(&self) -> bool {
+        if let Self::TInt = self {
+            true
+        } else {
+            false
+        }
+    }
+
+    pub fn is_bool(&self) -> bool {
+        if let Self::TBool = self {
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl From<&str> for Type {
@@ -33,6 +72,7 @@ impl fmt::Display for Type {
             Self::TArrow(t) => write!(f, "{}", *t),
             Self::TInt => write!(f, "int"),
             Self::TBool => write!(f, "bool"),
+            Self::TDummy => write!(f, "dummy"),
         }
     }
 }

@@ -40,6 +40,16 @@ impl Lambda {
     pub fn build_with_type(arg: &str, exp: Exp, ty: Type) -> Exp {
         Self::new_with_type(arg.into(), exp, ty).into()
     }
+
+    /// whether the current lambda exp is typed or not.
+    pub fn typed(&self) -> bool {
+        self.ty.is_some()
+    }
+
+    /// used after `typed` return true.
+    pub fn get_type_unchecked(&self) -> Type {
+        self.ty.clone().unwrap()
+    }
 }
 
 impl From<Lambda> for Exp {
