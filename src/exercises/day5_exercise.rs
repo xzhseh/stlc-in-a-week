@@ -99,7 +99,7 @@ impl Exp {
         }
     }
 
-    /// TODO(Day5-Q2): implement the type check function
+    /// TODO(Day5-Q2): implement the *bidirectional* type check function
     /// typically what it does is: for any given expression
     /// and the corresponding type, return true if
     /// the type checks, otherwise return false.
@@ -145,7 +145,7 @@ impl Exp {
                 context.insert(lambda.arg.clone(), t.ty1);
                 let second = lambda.exp.ty_check_inner(t.ty2, context);
                 // subsequent type check should *not* be affected
-                // e.g., Γ ⊢ (λx: TInt. x + 1) + (λy: TInt. y + 1) : TInt
+                // e.g., Γ ⊢ ((λx: TInt. x + 1) 1) + ((λy: TInt. y + 1) 1) : TInt
                 // when type check the second term (i.e., λy),
                 // the context with [x -> TInt] should not be visible.
                 context.remove(lambda.arg.clone());
@@ -160,17 +160,19 @@ impl Exp {
                     // 1. if `e1` is arrow type, i.e., lambda abstraction
                     Self::Lambda(lambda) => {
                         assert_eq!(lambda.typed(), true, "expect `lambda` to be typed");
-                        let Type::TArrow(t) = ty else {
-                            return false;
-                        };
+                        let t = lambda.get_type_unchecked();
                         // we now have *enough* information to type check `e2`
-                        let first = app.t2.ty_check_inner(t.ty1, context);
+                        let first = app.t2.ty_check_inner(t.clone(), context);
                         // short circuit
                         if !first {
                             return false;
                         }
                         // if `e2` type checks, now we can check the inner expression of lambda
-                        let second = lambda.exp.ty_check_inner(t.ty2, context);
+                        // note: remember to update & remove the context here
+                        context.insert(lambda.arg.clone(), t);
+                        let second = lambda.exp.ty_check_inner(ty, context);
+                        context.remove(lambda.arg.clone());
+
                         first && second
                     }
                     // 2. if `e1` is a variable.

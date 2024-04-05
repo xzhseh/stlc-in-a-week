@@ -26,7 +26,7 @@ fn test_typed_basic() {
 }
 
 #[test]
-fn test_ty_check_basic() {
+fn test_ty_check_basic_1() {
     // λx: TInt. λy: TInt. x + y
     let e = Lambda::build_with_type(
         "x",
@@ -44,11 +44,32 @@ fn test_ty_check_basic() {
     assert_eq!(e.ty_check(t), true);
 }
 
-/// this test requires you've correctly [1] implemented `ty_infer`
+/// the following "hard" tests requires you've correctly [1] implemented `ty_infer`,
+/// especially when type checking application.
 ///
-/// [1] for some definition of correctly.
+/// [1] well, for some definition of correctly.
 #[test]
-fn test_ty_check_hard() {
+fn test_ty_check_hard_1() {
+    // ((λx: TInt. x + 114513) 1) + ((λy: TInt. y + 1919809) 1)
+    let e = Add::build(
+        App::build(
+            Lambda::build_with_type("x", Add::build(Var::build("x"), 114514.into()), Type::TInt),
+            1.into(),
+        ),
+        App::build(
+            Lambda::build_with_type("y", Add::build(Var::build("y"), 1919810.into()), Type::TInt),
+            1.into(),
+        ),
+    );
+
+    // TInt
+    let t = Type::TInt;
+
+    assert_eq!(e.ty_check(t), true);
+}
+
+#[test]
+fn test_ty_check_hard_2() {
     // (TInt -> (TInt -> TInt))
     let tx = TArrow::build(Type::TInt, TArrow::build(Type::TInt, Type::TInt));
 
@@ -77,6 +98,40 @@ fn test_ty_check_hard() {
     );
 
     // (TInt -> (TInt -> TInt)) -> ((TInt -> TInt) -> (TInt -> TInt))
+    let t = TArrow::build(tx, TArrow::build(ty, TArrow::build(tz, Type::TInt)));
+    assert_eq!(e.ty_check(t), true);
+}
+
+#[test]
+fn test_ty_check_hard_3() {
+    // (TBool -> TInt)
+    let tx = TArrow::build(Type::TBool, Type::TInt);
+
+    // TBool
+    let ty = Type::TBool;
+
+    // TInt
+    let tz = Type::TInt;
+
+    // λx: (TBool -> TInt). λy: TBool. λz: TInt. ((x y) + z)
+    let e = Lambda::build_with_type(
+        "x",
+        Lambda::build_with_type(
+            "y",
+            Lambda::build_with_type(
+                "z",
+                Add::build(
+                    App::build(Var::build("x"), Var::build("y")),
+                    Var::build("z"),
+                ),
+                tz.clone(),
+            ),
+            ty.clone(),
+        ),
+        tx.clone(),
+    );
+
+    // (TBool -> TInt) -> (TBool -> (TInt -> TInt))
     let t = TArrow::build(tx, TArrow::build(ty, TArrow::build(tz, Type::TInt)));
     assert_eq!(e.ty_check(t), true);
 }
