@@ -2,7 +2,8 @@ use crate::{
     expr::{
         add::Add, app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda,
     },
-    Exp,
+    type_::{tarrow::TArrow, TyConstraint, TyConstraints, Type},
+    Env, Exp,
 };
 
 impl Exp {
@@ -73,6 +74,90 @@ impl Exp {
             }
             // do nothing
             Self::Nat(_) | Self::True | Self::False | Self::Var(_) => n,
+        }
+    }
+
+    /// TODO(Day6-Q2): The next thing is to implement a typing algorithm
+    /// that takes a typing environment and a *stlc exp*
+    /// and produces a type and a set of *type constraints* that must be
+    /// satisfied in order for the term to be well-typed.
+    /// as with the annotation function above,
+    /// this algorithm will need to conjure fresh type variables.
+    /// i.e., for which the `n` should exactly be used
+    pub fn ref_infer_constraints(
+        &self,
+        env: &mut Env,
+        n: u32,
+    ) -> Option<(u32, Type, TyConstraints)> {
+        match self.clone() {
+            // ct-true & ct-false
+            Self::True | Self::False => Some((n, Type::TBool, TyConstraints::empty())),
+            // ct-if
+            Self::Cond(cond) => {
+                let Some((n1, tc, c1)) = cond.r#if.ref_infer_constraints(env, n) else {
+                    return None;
+                };
+                let Some((n2, tt, c2)) = cond.r#then.ref_infer_constraints(env, n1) else {
+                    return None;
+                };
+                let Some((n3, te, c3)) = cond.r#else.ref_infer_constraints(env, n2) else {
+                    return None;
+                };
+                let c = TyConstraints::build(vec![
+                    TyConstraint::build(tc, Type::TBool),
+                    TyConstraint::build(tt.clone(), te),
+                ]);
+                Some((n3, tt, TyConstraints::merge(vec![c1, c2, c3, c])))
+            }
+            // ct-abs
+            Self::Lambda(lambda) => {
+                let t1 = lambda.get_type_unchecked();
+                env.insert(lambda.arg.clone(), t1.clone());
+                let Some((n1, t2, c)) = lambda.exp.ref_infer_constraints(env, n) else {
+                    return None;
+                };
+                env.remove(lambda.arg);
+                Some((n1, TArrow::build(t1, t2), c))
+            }
+            // ct-app
+            Self::App(app) => {
+                let Some((n1, t1, c1)) = app.t1.ref_infer_constraints(env, n) else {
+                    return None;
+                };
+                let Some((n2, t2, c2)) = app.t2.ref_infer_constraints(env, n1) else {
+                    return None;
+                };
+                let x: Type = format!("X{n2}").into();
+                let c = TyConstraints::build(vec![TyConstraint::build(
+                    t1,
+                    TArrow::build(t2, x.clone()),
+                )]);
+                Some((n2 + 1, x, TyConstraints::merge(vec![c1, c2, c])))
+            }
+            // ct-var
+            Self::Var(v) => {
+                let Some(t) = env.lookup(&v) else {
+                    return None;
+                };
+                Some((n, t, TyConstraints::empty()))
+            }
+            // ct-num
+            Self::Nat(_) => Some((n, Type::TInt, TyConstraints::empty())),
+            // ct-add
+            Self::Add(add) => {
+                let Some((n1, t1, c1)) = add.t1.ref_infer_constraints(env, n) else {
+                    return None;
+                };
+                let Some((n2, t2, c2)) = add.t2.ref_infer_constraints(env, n1) else {
+                    return None;
+                };
+                let c = TyConstraints::build(vec![
+                    TyConstraint::build(t1.clone(), Type::TInt),
+                    TyConstraint::build(t2.clone(), Type::TInt),
+                ]);
+                Some((n2, Type::TInt, TyConstraints::merge(vec![c1, c2, c])))
+            }
+            _ => panic!("not yet supported: {}", self),
         }
     }
 }

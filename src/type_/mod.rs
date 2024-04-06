@@ -82,3 +82,59 @@ impl fmt::Display for Type {
         }
     }
 }
+
+/// type constraint is just a equation between `type`
+/// e.g., X0 = X1, TInt = X2, TBool = TInt, X114514 = X1919810 -> TInt, etc.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct TyConstraint(Type, Type);
+
+impl TyConstraint {
+    pub fn build(t1: Type, t2: Type) -> Self {
+        Self(t1, t2)
+    }
+
+    pub fn left(&self) -> Type {
+        self.0.clone()
+    }
+
+    pub fn right(&self) -> Type {
+        self.1.clone()
+    }
+}
+
+impl fmt::Display for TyConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} == {}", self.left(), self.right())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TyConstraints(Vec<TyConstraint>);
+
+impl TyConstraints {
+    pub fn build(v: Vec<TyConstraint>) -> Self {
+        Self(v)
+    }
+
+    pub fn inner(self) -> Vec<TyConstraint> {
+        self.0
+    }
+
+    pub fn merge(v: Vec<TyConstraints>) -> Self {
+        let mut merged = vec![];
+        for t in v {
+            merged.extend(t.inner());
+        }
+        Self(merged)
+    }
+
+    pub fn empty() -> Self {
+        Self::build(vec![])
+    }
+}
+
+impl From<&[TyConstraint]> for TyConstraints {
+    fn from(value: &[TyConstraint]) -> Self {
+        Self(value.into_iter().map(|t| t.clone()).collect())
+    }
+}
