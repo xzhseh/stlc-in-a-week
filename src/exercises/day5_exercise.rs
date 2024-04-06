@@ -1,7 +1,4 @@
-use crate::{
-    type_::Type,
-    Env, Exp,
-};
+use crate::{type_::Type, Env, Exp};
 
 impl Exp {
     /// TODO(Day5-Q1): check if the current expression

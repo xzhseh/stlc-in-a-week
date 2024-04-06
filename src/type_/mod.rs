@@ -65,6 +65,12 @@ impl From<&str> for Type {
     }
 }
 
+impl From<String> for Type {
+    fn from(value: String) -> Self {
+        Self::TVar(value)
+    }
+}
+
 impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.clone() {
