@@ -8,7 +8,7 @@ use stlc::{
 fn test_annotate_term_basic_1() {
     // λx. x - untyped
     let mut e = Lambda::build("x", Var::build("x"));
-    e.ref_annotate_term();
+    e.annotate_term();
     let res = Lambda::build_with_type("x", Var::build("x"), "X0".into());
     assert_eq!(e, res);
 }
@@ -20,7 +20,7 @@ fn test_annotate_term_basic_2() {
         "x",
         Lambda::build("y", App::build(Var::build("x"), Var::build("y"))),
     );
-    e.ref_annotate_term();
+    e.annotate_term();
     let res = Lambda::build_with_type(
         "x",
         Lambda::build_with_type(
@@ -43,7 +43,7 @@ fn test_annotate_term_basic_3() {
         ),
         Lambda::build("z", Var::build("z")),
     );
-    e.ref_annotate_term();
+    e.annotate_term();
     let res = App::build(
         Lambda::build_with_type(
             "x",
@@ -67,7 +67,7 @@ fn test_infer_constraints_basic_1() {
         App::build(Var::build("x"), Var::build("x")),
         "X0".into(),
     );
-    let Some((n, t, c)) = e.ref_infer_constraints(&mut Env::new(), 3) else {
+    let Some((n, t, c)) = e.infer_constraints(&mut Env::new(), 3) else {
         panic!("expect infer constraints to generate the result for {}", e);
     };
     assert_eq!(n, 4);
@@ -100,7 +100,7 @@ fn test_infer_constraints_basic_2() {
         ),
         "X0".into(),
     );
-    let Some((n, t, c)) = e.ref_infer_constraints(&mut Env::new(), 3) else {
+    let Some((n, t, c)) = e.infer_constraints(&mut Env::new(), 3) else {
         panic!("expect infer constraints to generate the result for {}", e);
     };
     assert_eq!(n, 6);
