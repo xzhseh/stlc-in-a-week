@@ -120,6 +120,14 @@ impl TyConstraints {
         self.0
     }
 
+    pub fn inner_ref(&self) -> &Vec<TyConstraint> {
+        &self.0
+    }
+
+    pub fn contains(&self, t: &TyConstraint) -> bool {
+        self.0.contains(t)
+    }
+
     pub fn merge(v: Vec<TyConstraints>) -> Self {
         let mut merged = vec![];
         for t in v {
@@ -130,6 +138,10 @@ impl TyConstraints {
 
     pub fn empty() -> Self {
         Self::build(vec![])
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
     }
 }
 
