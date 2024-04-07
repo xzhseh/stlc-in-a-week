@@ -30,7 +30,9 @@ The general roadmap of this tutorial is as follows, of course, it's under constr
 
 - **day 5**: at this very moment, let's make our untyped lambda calculus typed - well of course, by introducing types. plus, you will learn how to conduct a **bidirectional** type check and inference on the upgraded simply-typed lambda calculus.
 
-- **[WIP] day 6-7**: the constraint-based type check; and unification.
+- **day 6**: after implementing the bidirectional type check / inference in day 5, let's try something different - a brand new **constraint-based** typing algorithm. you'd expect more typing rules (sounds excited?), more state transfers, and more fun for sure.
+
+- **[WIP] day 7**: unification.
 
 Regarding official handout(s), currently they are only available (in chinese) on my [zhihu article page](https://www.zhihu.com/people/dawn-36-29-53/posts).
 
@@ -64,4 +66,4 @@ cargo test --test <specific day>
 
 ### Reference Solutions
 
-I have provide all my reference solutions for this tutorial from `day1` to `day5`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
+I have provide all my reference solutions for this tutorial from `day1` to `day6`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
