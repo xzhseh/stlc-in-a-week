@@ -152,6 +152,10 @@ impl TySubst {
         &mut self.0
     }
 
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
     pub fn inner(self) -> HashMap<String, Type> {
         self.0
     }
