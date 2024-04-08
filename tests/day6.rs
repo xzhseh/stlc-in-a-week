@@ -1,7 +1,6 @@
 use stlc::{
     expr::{app::App, lambda::Lambda, var::Var},
-    type_::{tarrow::TArrow, TyConstraint, TyConstraints},
-    Env,
+    type_::{tarrow::TArrow, Env, TyConstraint, TyConstraints},
 };
 
 #[test]

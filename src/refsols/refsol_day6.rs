@@ -2,8 +2,8 @@ use crate::{
     expr::{
         add::Add, app::App, cond::Cond, decr::Decr, incr::Incr, is_zero::IsZero, lambda::Lambda,
     },
-    type_::{tarrow::TArrow, TyConstraint, TyConstraints, Type},
-    Env, Exp,
+    type_::{tarrow::TArrow, Env, TyConstraint, TyConstraints, Type},
+    Exp,
 };
 
 impl Exp {

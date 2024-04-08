@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    type_::{tarrow::TArrow, TyConstraint, Type},
-    Env, Exp, TySubst,
+    type_::{tarrow::TArrow, Env, TyConstraint, TySubst, Type},
+    Exp,
 };
 
 impl Type {

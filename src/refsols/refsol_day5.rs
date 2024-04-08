@@ -1,6 +1,6 @@
 use crate::{
-    type_::{tarrow::TArrow, Type},
-    Env, Exp,
+    type_::{tarrow::TArrow, Env, Type},
+    Exp,
 };
 
 impl Exp {

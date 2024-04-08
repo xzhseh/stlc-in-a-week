@@ -1,6 +1,6 @@
 use crate::{
-    type_::{TyConstraints, Type},
-    Env, Exp,
+    type_::{Env, TyConstraints, Type},
+    Exp,
 };
 
 impl Exp {
