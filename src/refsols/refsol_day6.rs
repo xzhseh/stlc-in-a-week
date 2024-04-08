@@ -7,13 +7,13 @@ use crate::{
 };
 
 impl Exp {
-    pub fn ref_annotate_term(&mut self) {
+    pub fn ref_annotate_term(&mut self) -> u32 {
         assert_eq!(
             self.ref_typed(),
             false,
             "expect `annotate_term` to be called on an untyped exp"
         );
-        self.ref_annotate_term_inner(0);
+        self.ref_annotate_term_inner(0)
     }
 
     fn ref_annotate_term_inner(&mut self, n: u32) -> u32 {

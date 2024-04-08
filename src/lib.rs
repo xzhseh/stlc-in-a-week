@@ -4,11 +4,22 @@ use std::collections::HashMap;
 use expr::{add::Add, app::App, cond::Cond, lambda::Lambda};
 use type_::Type;
 
+/// the exercises from day1 to day7.
 pub mod exercises;
+
+/// our definitions for stlc expression.
 pub mod expr;
+
+/// the frontend.
 pub mod interactive_shell;
+
+/// my reference solutions, feel free to check it out.
 pub mod refsols;
+
+/// our custom errors.
 pub mod stlc_err;
+
+/// the type for simply-typed lambda calculus.
 pub mod type_;
 
 /// The definition for our (currently) untyped lambda calculus
