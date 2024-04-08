@@ -18,7 +18,7 @@ e ::= x         -- variable
     | e e       -- application
 ```
 
-The general roadmap of this tutorial is as follows, of course, it's under construction. (especially for type system and corresponding handouts)
+The general roadmap of this tutorial is as follows, the exercises / refsols parts are all available now - handouts are still under construction.
 
 - **day 1 ([handout](https://zhuanlan.zhihu.com/p/685876438) available)**: you will learn the basic **syntax** of the language with the design of how to embed our (currently) untyped lambda calculus using `Rust Enum`, do some simple encoding exercises, while also having the chance to add more syntax rules yourself (and of course, play with them).
 
@@ -32,7 +32,7 @@ The general roadmap of this tutorial is as follows, of course, it's under constr
 
 - **day 6**: after implementing the bidirectional type check / inference in day 5, let's try something different - a brand new **constraint-based** typing algorithm. you'd expect more typing rules (sounds excited?), more state transfers, and more fun for sure.
 
-- **[WIP] day 7**: unification.
+- **day 7**: now it's time to put all the pieces together to achieve the constraint-based type inference ability; you'll learn how to unify (a.k.a. find the best unifier) among the given type substitution, plus put all the previous pieces you've implemented together - and infer the type for any given **untyped** lambda calculus expression! (ps. though it may not succeed for some "invalid" expressions)
 
 Regarding official handout(s), currently they are only available (in chinese) on my [zhihu article page](https://www.zhihu.com/people/dawn-36-29-53/posts).
 
@@ -66,4 +66,4 @@ cargo test --test <specific day>
 
 ### Reference Solutions
 
-I have provide all my reference solutions for this tutorial from `day1` to `day6`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.
+I have provide all my reference solutions for this tutorial from `day1` to `day7`, in `src/refsols` module. Feel free to check them out, or you can also play with my "official" solution(s) via the interactive environment.

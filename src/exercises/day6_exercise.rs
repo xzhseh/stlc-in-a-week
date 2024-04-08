@@ -16,10 +16,10 @@ impl Exp {
     /// of your type variable may be of help.
     ///
     /// some examples are as follow.
-    /// 1. (λx. x).annotate_term() ≡ (λx: X0. x)
-    /// 2. (λx. λy. x y).annotate_term() ≡ (λx: X0. λy: X1: x y)
-    /// 3. ((λx. λy. x y) (λz. z)).annotate_term() ≡ (λx: X0. λy:X1: x y) (λz: X2. z)
-    pub fn annotate_term(&mut self) {
+    /// 1. (λx. x).annotate_term() ≡ (λx: X0. x) 1
+    /// 2. (λx. λy. x y).annotate_term() ≡ (λx: X0. λy: X1: x y) 2
+    /// 3. ((λx. λy. x y) (λz. z)).annotate_term() ≡ (λx: X0. λy:X1: x y) (λz: X2. z) 3
+    pub fn annotate_term(&mut self) -> u32 {
         todo!()
     }
 

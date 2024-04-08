@@ -8,7 +8,8 @@ use stlc::{
 fn test_annotate_term_basic_1() {
     // λx. x - untyped
     let mut e = Lambda::build("x", Var::build("x"));
-    e.annotate_term();
+    let n = e.annotate_term();
+    assert_eq!(n, 1);
     let res = Lambda::build_with_type("x", Var::build("x"), "X0".into());
     assert_eq!(e, res);
 }
@@ -20,7 +21,8 @@ fn test_annotate_term_basic_2() {
         "x",
         Lambda::build("y", App::build(Var::build("x"), Var::build("y"))),
     );
-    e.annotate_term();
+    let n = e.annotate_term();
+    assert_eq!(n, 2);
     let res = Lambda::build_with_type(
         "x",
         Lambda::build_with_type(
@@ -43,7 +45,8 @@ fn test_annotate_term_basic_3() {
         ),
         Lambda::build("z", Var::build("z")),
     );
-    e.annotate_term();
+    let n = e.annotate_term();
+    assert_eq!(n, 3);
     let res = App::build(
         Lambda::build_with_type(
             "x",
