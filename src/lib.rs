@@ -87,7 +87,8 @@ impl fmt::Display for Strategy {
     }
 }
 
-/// the context for type check (and infer).
+/// the context for type check (and infer) - the mapping
+/// from *stlc variable* exp to type.
 /// note: used after day5.
 #[derive(Clone, Debug)]
 pub struct Env(HashMap<String, Type>);
@@ -107,5 +108,44 @@ impl Env {
 
     pub fn lookup(&self, key: &String) -> Option<Type> {
         self.0.get(key).cloned()
+    }
+}
+
+/// definition of type substituion - which is just the mapping
+/// from *type variable* to type. (could also be another type variable though!)
+#[derive(Clone, Debug)]
+pub struct TySubst(HashMap<String, Type>);
+
+impl TySubst {
+    pub fn new() -> Self {
+        Self(HashMap::new())
+    }
+
+    pub fn insert(&mut self, key: String, ty: Type) -> Option<Type> {
+        self.0.insert(key, ty)
+    }
+
+    pub fn remove(&mut self, key: String) -> Option<Type> {
+        self.0.remove(&key)
+    }
+
+    pub fn lookup(&self, key: &String) -> Option<Type> {
+        self.0.get(key).cloned()
+    }
+
+    pub fn contains(&self, key: &String) -> bool {
+        self.0.contains_key(key)
+    }
+
+    pub fn inner_mut(&mut self) -> &mut HashMap<String, Type> {
+        &mut self.0
+    }
+
+    pub fn inner(self) -> HashMap<String, Type> {
+        self.0
+    }
+
+    pub fn replace(&mut self, new: HashMap<String, Type>) {
+        self.0 = new;
     }
 }

@@ -9,3 +9,5 @@ pub mod day4_exercise;
 pub mod day5_exercise;
 
 pub mod day6_exercise;
+
+pub mod day7_exercise;
