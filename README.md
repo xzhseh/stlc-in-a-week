@@ -32,7 +32,7 @@ The general roadmap of this tutorial is as follows, the exercises / refsols part
 
 - **day 6**: after implementing the bidirectional type check / inference in day 5, let's try something different - a brand new **constraint-based** typing algorithm. you'd expect more typing rules (sounds excited?), more state transfers, and more fun for sure.
 
-- **day 7**: now it's time to put all the pieces together to achieve the constraint-based type inference ability; you'll learn how to unify (a.k.a. find the best unifier) among the given type substitution, plus put all the previous pieces you've implemented together - and infer the type for any given **untyped** lambda calculus expression! (ps. though it may not succeed for some "invalid" expressions)
+- **day 7**: now it's time to put all the pieces together to achieve the constraint-based type inference ability; you'll learn how to **unify** (a.k.a. find the best unifier) among the given **type substitution**, plus putting the pieces you've implemented before all together - and infer the type for any given **untyped** lambda calculus expression! (ps. though it may not succeed for some "invalid" expressions)
 
 Regarding official handout(s), currently they are only available (in chinese) on my [zhihu article page](https://www.zhihu.com/people/dawn-36-29-53/posts).
 
