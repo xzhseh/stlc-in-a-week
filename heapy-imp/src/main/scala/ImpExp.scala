@@ -9,8 +9,8 @@ case class ConjExp(b1: BExp, b2: BExp)
 
 // the signal for imp stmt
 enum Signal {
-    case Break, Continue
-    def isBreak: Boolean = this == Signal.Break
+  case Break, Continue
+  def isBreak: Boolean = this == Signal.Break
 }
 
 // assign, i.e., x := v
@@ -33,10 +33,10 @@ case class StoreExp(deref: AExp, value: AExp)
 
 // helper method for validation
 def validate(exp: String, upperBound: Int, size: Int): Unit = {
-    assert(
-      size <= upperBound,
-      s"expect the number of `args` used to build `$exp` is less or equal than $upperBound"
-    )
+  assert(
+    size <= upperBound,
+    s"expect the number of `args` used to build `$exp` is less or equal than $upperBound"
+  )
 }
 
 // think of our memory-model for heapy-imp just as a mapping
