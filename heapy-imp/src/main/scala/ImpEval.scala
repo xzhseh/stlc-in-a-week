@@ -10,7 +10,10 @@ enum AExp {
     case Add(add: AddExp)
 
     // pointing to a specific address in our heap
-    case Pointer(addr: AExp)
+    case Ref(s: String)
+
+    // dereference, i.e., *X
+    case Deref(s: String)
 }
 
 // boolean expression
@@ -33,7 +36,8 @@ enum BExp {
 
 // imp statement
 enum ImpStmt {
-    // assign (or load from heap)
+    // assign (including reference/pointer *update*, e.g., X = X)
+    // note: memory read is also included, e.g., x := *X
     case Assign(a: AssignExp)
 
     // sequence
@@ -50,14 +54,19 @@ enum ImpStmt {
 
     case Break
 
-    // write to heap
-    case Write(w: WriteExp)
+    // memory allocation, i.e., X := new(A)
+    case Alloc(a: AllocExp)
+
+    // memory store, a.k.a. update the value in the specific heap address
+    case Store(s: StoreExp)
 }
 
 type ImpEvalContext = Map[String, Int]
 
 // the default value for variable in arithmetic expression
-val DefaultVal: Int = 0
+object AExp {
+    val DEFAULT_VAL : Int = 0
+}
 
 extension (a: AExp) {
     // the interpreter / evaluator for arithmetic expression
@@ -74,15 +83,24 @@ extension (a: AExp) {
                 if sigma.contains(s) then {
                     sigma(s)
                 } else {
-                    DefaultVal
+                    AExp.DEFAULT_VAL
                 }
             }
-            case AExp.Pointer(addr) => {
-                val address = addr.aeval(sigma)
-                if heap.contains(address) then {
-                    heap(address)
+            // the semantic of `aeval(ref)` is just returning the address
+            case AExp.Ref(r) => {
+                if sigma.contains(r) then {
+                    sigma(r)
                 } else {
-                    DefaultVal
+                    assert(false, "invalid pointer")
+                }
+            }
+            case AExp.Deref(d) => {
+                if sigma.contains(d) then {
+                    assert(heap.contains(sigma(d)), s"expect address ${sigma(d)} to be valid in heap")
+                    heap(sigma(d))
+                } else {
+                    // do *not* access the memory that has not been allocated
+                    assert(false, "segmentation fault")
                 }
             }
         }
@@ -122,7 +140,9 @@ extension (i: ImpStmt) {
             case ImpStmt.Assign(a) => {
                 val x = a.x match
                     case AExp.Var(s: String) => s
-                    case _ => assert(false, "expect `a.x` to be a variable")
+                    // ptr/ref update, e.g., X = X
+                    case AExp.Ref(s: String) => s
+                    case _ => assert(false, "expect `a.x` to be a variable or reference/pointer")
                 val v = a.v.aeval(sigma)
                 // update the context
                 (sigma + (x -> v), Signal.Continue)
@@ -150,12 +170,28 @@ extension (i: ImpStmt) {
                     else i.ieval(sigmaV1)
                 else (sigma, Signal.Continue)
             }
-            // e-write
-            case ImpStmt.Write(w) => {
-                val address = w.addr.aeval(sigma)
-                val value   = w.value.aeval(sigma)
-                // update heap
-                heap = heap + (address -> value)
+            // e-alloc
+            case ImpStmt.Alloc(a) => {
+                val ref = a.ref match {
+                    case AExp.Ref(s) => s
+                    case _ => assert(false, s"expect ref/pointer type for allocation, but get ${a.ref}")
+                }
+                val newAddr = nextAddr()
+                // update the heap
+                heap += (newAddr -> a.value.aeval(sigma))
+                // update the context
+                (sigma + (ref -> newAddr), Signal.Continue)
+            }
+            // e-store
+            case ImpStmt.Store(s) => {
+                val deref = s.deref match {
+                    case AExp.Deref(s) => s
+                    case _ => assert(false, s"expect deref for store, but get ${s.deref}")
+                }
+                assert(sigma.contains(deref), "expect a valid pointer for dereference")
+                assert(heap.contains(sigma(deref)), "expect a valid address for store")
+                // update the heap
+                heap += (sigma(deref) -> s.value.aeval(sigma))
                 (sigma, Signal.Continue)
             }
         }

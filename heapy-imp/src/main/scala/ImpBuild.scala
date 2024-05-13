@@ -7,8 +7,9 @@ object Buildable {
         def build(args: Any*): AExp = {
             validate("AExp", 2, args.size)
             args match {
-                case Seq(v: AExp) if args.size == 1 => AExp.Pointer(v)
-                case Seq(a1: AExp, a2: AExp) if args.size == 2 =>
+                case Seq("ref", s: String) => AExp.Ref(s)
+                case Seq("deref", s: String) => AExp.Deref(s)
+                case Seq("add", a1: AExp, a2: AExp) =>
                     AExp.Add(AddExp(a1, a2))
                 case _ =>
                     assert(
@@ -46,7 +47,7 @@ object Buildable {
                 case SSeq(x: AExp, v: AExp) if args.size == 2 =>
                     ImpStmt.Assign(AssignExp(x, v))
                 case SSeq(_: String, x: AExp, v: AExp) if args.size == 3 =>
-                    ImpStmt.Write(WriteExp(x, v))
+                    ImpStmt.Alloc(AllocExp(x, v))
                 case SSeq(i1: ImpStmt, i2: ImpStmt) if args.size == 2 =>
                     ImpStmt.Seq(SeqExp(i1, i2))
                 case SSeq(b: BExp, i1: ImpStmt, i2: ImpStmt)
@@ -64,6 +65,7 @@ object Buildable {
     }
 }
 
+// syntax sugar for building `AExp.Var/Nat` from `String/Int`
 trait Into[S, T] {
     extension (e: S) def into: T
 }

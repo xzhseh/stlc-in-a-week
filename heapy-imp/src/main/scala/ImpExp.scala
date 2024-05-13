@@ -25,8 +25,11 @@ case class CondExp(b: BExp, i1: ImpStmt, i2: ImpStmt)
 // while
 case class WhileExp(b: BExp, i: ImpStmt)
 
-// write, i.e., heap[addr] := value
-case class WriteExp(addr: AExp, value: AExp)
+// allocation, i.e., X := new(A)
+case class AllocExp(ref: AExp, value: AExp)
+
+// store, i.e., *X := A
+case class StoreExp(deref: AExp, value: AExp)
 
 // helper method for validation
 def validate(exp: String, upperBound: Int, size: Int): Unit = {
@@ -48,3 +51,11 @@ type Heap = Map[Int, Int]
 // "share" value between two or even more applications.
 // note: the application is just a evaluable `ImpStmt`.
 var heap: Heap = Map()
+
+var globalAddr: Int = 0
+
+def nextAddr(): Int = {
+  val ret = globalAddr
+  globalAddr += 1
+  ret
+}
