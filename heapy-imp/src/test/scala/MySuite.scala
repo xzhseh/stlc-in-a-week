@@ -46,28 +46,28 @@ class MySuite extends munit.FunSuite {
     // }
     val i2 = build[ImpStmt](
       // x := 1
-      build[ImpStmt](build[AExp]("x"), build[AExp](1)),
+      build[ImpStmt]("x".into, 1.into),
       build[ImpStmt](
         // counter := 0
-        build[ImpStmt](build[AExp]("counter"), build[AExp](0)),
+        build[ImpStmt]("counter".into, 0.into),
         // while True
         build[ImpStmt](
           BExp.True,
           build[ImpStmt](
             // x := x + x
             build[ImpStmt](
-              build[AExp]("x"),
-              build[AExp](build[AExp]("x"), build[AExp]("x"))
+              "x".into,
+              build[AExp]("x".into, "x".into)
             ),
             build[ImpStmt](
               // counter := counter + 1
               build[ImpStmt](
-                build[AExp]("counter"),
-                build[AExp](build[AExp]("counter"), build[AExp](1))
+                "counter".into,
+                build[AExp]("counter".into, 1.into)
               ),
               // if 10 <= counter then break else skip
               build[ImpStmt](
-                build[BExp](build[AExp](10), build[AExp]("counter")),
+                build[BExp](10.into, "counter".into),
                 ImpStmt.Break,
                 ImpStmt.Skip
               )
@@ -78,24 +78,25 @@ class MySuite extends munit.FunSuite {
     )
 
     // x := 0x114514;
-    // h[x] = 1919810
+    // h[x] := 1919810
     val i3 = build[ImpStmt](
-      build[ImpStmt](build[AExp]("x"), build[AExp](0x114514)),
-      build[ImpStmt]("write", build[AExp]("x"), build[AExp](1919810))
+      build[ImpStmt]("x".into, 0x114514.into),
+      build[ImpStmt]("write", "x".into, 1919810.into)
     )
 
     // y := h[0x114514];
     // y := y + 1;
-    // h[0x114514] = y
+    // h[0x114514] := y
     val i4 = build[ImpStmt](
-      build[ImpStmt](build[AExp]("y"), build[AExp](build[AExp](0x114514))),
+      build[ImpStmt]("y".into, build[AExp](0x114514.into)),
       build[ImpStmt](
         // y := y + 1
         build[ImpStmt](
-          build[AExp]("y"),
-          build[AExp](build[AExp]("y"), build[AExp](1))
+          "y".into,
+          build[AExp]("y".into, 1.into)
         ),
-        build[ImpStmt]("write", build[AExp](0x114514), build[AExp]("y"))
+        // h[0x114514] := y
+        build[ImpStmt]("write", 0x114514.into, "y".into)
       )
     )
 

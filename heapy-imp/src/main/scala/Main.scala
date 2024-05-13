@@ -8,8 +8,8 @@
     println(s"a + b = ${c.aeval(context)}, expected: ${114514 + 1919810}")
 
     val e = build[AExp](
-      build[AExp]("a"),
-      build[AExp](114514)
+      "a".into,
+      114514.into
     )
 
     println(s"e.aeval = ${e.aeval(context)}, expected: ${114514 + 1919810}")

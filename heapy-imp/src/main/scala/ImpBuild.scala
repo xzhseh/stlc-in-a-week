@@ -7,9 +7,7 @@ object Buildable {
         def build(args: Any*): AExp = {
             validate("AExp", 2, args.size)
             args match {
-                case Seq(v: String) if args.size == 1 => AExp.Var(v)
-                case Seq(v: Int) if args.size == 1    => AExp.Nat(v)
-                case Seq(v: AExp) if args.size == 1   => AExp.Pointer(v)
+                case Seq(v: AExp) if args.size == 1 => AExp.Pointer(v)
                 case Seq(a1: AExp, a2: AExp) if args.size == 2 =>
                     AExp.Add(AddExp(a1, a2))
                 case _ =>
@@ -64,4 +62,16 @@ object Buildable {
             }
         }
     }
+}
+
+trait Into[S, T] {
+    extension (e: S) def into: T
+}
+
+given Into[String, AExp] with {
+    extension (e: String) def into: AExp = AExp.Var(e)
+}
+
+given Into[Int, AExp] with {
+    extension (e: Int) def into: AExp = AExp.Nat(e)
 }
