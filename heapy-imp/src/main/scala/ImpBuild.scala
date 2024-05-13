@@ -5,7 +5,7 @@ trait Buildable[T] {
 object Buildable {
     implicit object AExpBuildable extends Buildable[AExp] {
         def build(args: Any*): AExp = {
-            validate("AExp", 2, args.size)
+            validate("AExp", 3, args.size)
             args match {
                 case Seq("ref", s: String) => AExp.Ref(s)
                 case Seq("deref", s: String) => AExp.Deref(s)
@@ -22,12 +22,12 @@ object Buildable {
 
     implicit object BExpBuildable extends Buildable[BExp] {
         def build(args: Any*): BExp = {
-            validate("BExp", 2, args.size)
+            validate("BExp", 3, args.size)
             args match {
-                case Seq(e: BExp) if args.size == 1 => BExp.Neg(e)
-                case Seq(a1: AExp, a2: AExp) if args.size == 2 =>
+                case Seq("neg", e: BExp) => BExp.Neg(e)
+                case Seq("comp", a1: AExp, a2: AExp) =>
                     BExp.Comp(CompExp(a1, a2))
-                case Seq(b1: BExp, b2: BExp) if args.size == 2 =>
+                case Seq("conj", b1: BExp, b2: BExp) =>
                     BExp.Conj(ConjExp(b1, b2))
                 case _ =>
                     assert(
@@ -42,19 +42,20 @@ object Buildable {
         def build(args: Any*): ImpStmt = {
             // to prevent naming conflict
             import scala.Seq as SSeq
-            validate("ImpStmt", 3, args.size)
+            validate("ImpStmt", 4, args.size)
             args match {
-                case SSeq(x: AExp, v: AExp) if args.size == 2 =>
+                case SSeq("assign", x: AExp, v: AExp) =>
                     ImpStmt.Assign(AssignExp(x, v))
-                case SSeq(_: String, x: AExp, v: AExp) if args.size == 3 =>
-                    ImpStmt.Alloc(AllocExp(x, v))
-                case SSeq(i1: ImpStmt, i2: ImpStmt) if args.size == 2 =>
+                case SSeq("seq", i1: ImpStmt, i2: ImpStmt) =>
                     ImpStmt.Seq(SeqExp(i1, i2))
-                case SSeq(b: BExp, i1: ImpStmt, i2: ImpStmt)
-                    if args.size == 3 =>
+                case SSeq("cond", b: BExp, i1: ImpStmt, i2: ImpStmt) =>
                     ImpStmt.Cond(CondExp(b, i1, i2))
-                case SSeq(b: BExp, i: ImpStmt) if args.size == 2 =>
+                case SSeq("while", b: BExp, i: ImpStmt) =>
                     ImpStmt.While(WhileExp(b, i))
+                case SSeq("alloc", ref: AExp, value: AExp) =>
+                    ImpStmt.Alloc(AllocExp(ref, value))
+                case SSeq("store", deref: AExp, value: AExp) =>
+                    ImpStmt.Store(StoreExp(deref, value))
                 case _ =>
                     assert(
                       false,

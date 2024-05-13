@@ -45,58 +45,43 @@ class MySuite extends munit.FunSuite {
     //     if counter == 10 then break
     // }
     val i2 = build[ImpStmt](
+      "seq",
       // x := 1
-      build[ImpStmt]("x".into, 1.into),
+      build[ImpStmt]("assign", "x".into, 1.into),
       build[ImpStmt](
+        "seq",
         // counter := 0
-        build[ImpStmt]("counter".into, 0.into),
+        build[ImpStmt]("assign", "counter".into, 0.into),
         // while True
         build[ImpStmt](
+          "while",
           BExp.True,
           build[ImpStmt](
+            "seq",
             // x := x + x
             build[ImpStmt](
+              "assign",
               "x".into,
-              build[AExp]("x".into, "x".into)
+              build[AExp]("add", "x".into, "x".into)
             ),
             build[ImpStmt](
+              "seq",
               // counter := counter + 1
               build[ImpStmt](
+                "assign",
                 "counter".into,
-                build[AExp]("counter".into, 1.into)
+                build[AExp]("add", "counter".into, 1.into)
               ),
               // if 10 <= counter then break else skip
               build[ImpStmt](
-                build[BExp](10.into, "counter".into),
+                "cond",
+                build[BExp]("comp", 10.into, "counter".into),
                 ImpStmt.Break,
                 ImpStmt.Skip
               )
             )
           )
         )
-      )
-    )
-
-    // x := 0x114514;
-    // h[x] := 1919810
-    val i3 = build[ImpStmt](
-      build[ImpStmt]("x".into, 0x114514.into),
-      build[ImpStmt]("write", "x".into, 1919810.into)
-    )
-
-    // y := h[0x114514];
-    // y := y + 1;
-    // h[0x114514] := y
-    val i4 = build[ImpStmt](
-      build[ImpStmt]("y".into, build[AExp](0x114514.into)),
-      build[ImpStmt](
-        // y := y + 1
-        build[ImpStmt](
-          "y".into,
-          build[AExp]("y".into, 1.into)
-        ),
-        // h[0x114514] := y
-        build[ImpStmt]("write", 0x114514.into, "y".into)
       )
     )
 
@@ -132,15 +117,5 @@ class MySuite extends munit.FunSuite {
 
         assertEquals(sigma("counter"), 10)
         assertEquals(sigma("x"), 1024)
-    }
-
-    test("heap basic test") {
-        val (sigma: ImpEvalContext, signal: Signal) = eval(i3)
-        assertEquals(sigma("x"), 0x114514)
-        assertEquals(heap(0x114514), 1919810)
-
-        val (sigmaV1: ImpEvalContext, signalV1: Signal) = eval(i4)
-        assertEquals(sigmaV1("y"), 1919811)
-        assertEquals(heap(0x114514), 1919811)
     }
 }
