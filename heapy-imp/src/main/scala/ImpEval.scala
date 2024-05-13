@@ -91,7 +91,7 @@ extension (a: AExp) {
                 if sigma.contains(r) then {
                     sigma(r)
                 } else {
-                    assert(false, "invalid pointer")
+                    throw InvalidParameter("invalid pointer")
                 }
             }
             case AExp.Deref(d) => {
@@ -100,7 +100,7 @@ extension (a: AExp) {
                     heap(sigma(d))
                 } else {
                     // do *not* access the memory that has not been allocated
-                    assert(false, "segmentation fault")
+                    throw SegmentationFault(s"invalid pointer $d for dereference")
                 }
             }
         }
@@ -142,7 +142,7 @@ extension (i: ImpStmt) {
                     case AExp.Var(s: String) => s
                     // ptr/ref update, e.g., X = X
                     case AExp.Ref(s: String) => s
-                    case _ => assert(false, "expect `a.x` to be a variable or reference/pointer")
+                    case _ => throw InvalidParameter("expect `a.x` to be a variable or reference/pointer")
                 val v = a.v.aeval(sigma)
                 // update the context
                 (sigma + (x -> v), Signal.Continue)
@@ -174,7 +174,7 @@ extension (i: ImpStmt) {
             case ImpStmt.Alloc(a) => {
                 val ref = a.ref match {
                     case AExp.Ref(s) => s
-                    case _ => assert(false, s"expect ref/pointer type for allocation, but get ${a.ref}")
+                    case _ => throw InvalidParameter(s"expect ref/pointer type for allocation, but get ${a.ref}")
                 }
                 val newAddr = nextAddr()
                 // update the heap
@@ -186,7 +186,7 @@ extension (i: ImpStmt) {
             case ImpStmt.Store(s) => {
                 val deref = s.deref match {
                     case AExp.Deref(s) => s
-                    case _ => assert(false, s"expect deref for store, but get ${s.deref}")
+                    case _ => throw InvalidParameter(s"expect deref for store, but get ${s.deref}")
                 }
                 assert(sigma.contains(deref), "expect a valid pointer for dereference")
                 assert(heap.contains(sigma(deref)), "expect a valid address for store")

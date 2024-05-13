@@ -98,6 +98,14 @@ class MySuite extends munit.FunSuite {
       )
     )
 
+    // x := *X
+    // note: this will cause segmentation fault exception being thrown
+    val i4 = build[ImpStmt](
+      "assign",
+      "x".into,
+      build[AExp]("deref", "X")
+    )
+
     test("aeval basic test") {
         val a1 = AExp.Nat(114514)
         val a2 = AExp.Nat(1919810)
@@ -137,5 +145,11 @@ class MySuite extends munit.FunSuite {
 
       assertEquals(heap(sigma("X")), 1919810)
       assertEquals(heap(sigma("Y")), 1919810)
+    }
+
+    test("segfault basic test") {
+      intercept[SegmentationFault] {
+        val (_, _) = eval(i4)
+      }
     }
 }
