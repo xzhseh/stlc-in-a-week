@@ -85,6 +85,19 @@ class MySuite extends munit.FunSuite {
       )
     )
 
+    // X := new(114514);
+    // Y = X
+    // *Y := 1919810
+    val i3 = build[ImpStmt](
+      "seq",
+      build[ImpStmt]("alloc", build[AExp]("ref", "X"), 114514.into),
+      build[ImpStmt](
+        "seq",
+        build[ImpStmt]("assign", build[AExp]("ref", "Y"), build[AExp]("ref", "X")),
+        build[ImpStmt]("store", build[AExp]("deref", "Y"), 1919810.into)
+      )
+    )
+
     test("aeval basic test") {
         val a1 = AExp.Nat(114514)
         val a2 = AExp.Nat(1919810)
@@ -117,5 +130,12 @@ class MySuite extends munit.FunSuite {
 
         assertEquals(sigma("counter"), 10)
         assertEquals(sigma("x"), 1024)
+    }
+
+    test("heap basic test") {
+      val (sigma: ImpEvalContext, signal: Signal) = eval(i3)
+
+      assertEquals(heap(sigma("X")), 1919810)
+      assertEquals(heap(sigma("Y")), 1919810)
     }
 }
