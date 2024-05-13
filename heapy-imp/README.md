@@ -17,4 +17,6 @@ instead of a giant consecutive byte array (or vector), everything in the memory 
 
 the map is just a one-to-one mapping from **address** to **value**, and both are just `Int`.
 
+do note that to achieve the explicit memory management, every reference/pointer needs to be allocated (i.e., see `ImpStmt.Alloc`) before actually using (e.g., ref/deref/update) it.
+
 to see the detailed definition, check `ImpExp.scala`.
