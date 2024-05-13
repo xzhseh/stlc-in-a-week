@@ -1,2 +1,15 @@
-/target
-/.DS_Store
+target/
+
+.DS_Store
+
+# Bloop
+.bsp
+
+# VS Code
+.vscode/
+
+# Metals
+.bloop/
+.metals/
+metals.sbt
+.scala-build
